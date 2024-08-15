@@ -1,0 +1,11 @@
+.dashboard__row {
+  display: flex;
+  gap: 20px;
+}
+
+@media screen and (max-width: 800px) {
+  .dashboard__row {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

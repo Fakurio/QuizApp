@@ -1,0 +1,29 @@
+.searchbar {
+  background-color: var(--secondary-color);
+  display: flex;
+  gap: 5px;
+  padding: 0.5rem;
+  border-radius: 5px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.searchbar__icon {
+  width: 25px;
+}
+
+.searchbar__input {
+  background-color: transparent;
+  border: none;
+  color: inherit;
+  font-size: 0.9rem;
+  width: 100%;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 800px) {
+  .searchbar {
+    grid-row: 2/ 3;
+    grid-column: 1 / 4;
+  }
+}

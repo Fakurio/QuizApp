@@ -1,0 +1,34 @@
+.sidepanel {
+  margin-top: 1rem;
+  background-color: var(--secondary-color);
+  border-radius: 5px;
+  max-width: 200px;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+}
+
+.sidepanel__container {
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+@media screen and (max-width: 800px) {
+  .sidepanel {
+    max-width: 100%;
+  }
+
+  .sidepanel__container {
+    flex-direction: row;
+  }
+
+  .sidepanel button {
+    width: auto;
+    flex: 1;
+  }
+}

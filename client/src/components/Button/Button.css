@@ -1,0 +1,17 @@
+.button {
+  background-color: var(--accent-color);
+  border: none;
+  border-radius: 5px;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  font-weight: 500;
+}
+
+.button__icon {
+  width: 20px;
+}

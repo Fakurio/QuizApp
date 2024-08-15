@@ -1,0 +1,29 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 60px;
+}
+
+.header__logo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.header__logo h1 {
+  color: var(--accent-color);
+}
+
+@media screen and (max-width: 800px) {
+  .header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0;
+  }
+
+  .header__login {
+    grid-column: 3 / 4;
+  }
+}

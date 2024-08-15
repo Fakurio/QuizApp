@@ -1,0 +1,17 @@
+.tileboard {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 1rem;
+  background-color: var(--secondary-color);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+@media screen and (max-width: 800px) {
+  .tileboard {
+    gap: 20px;
+  }
+}
