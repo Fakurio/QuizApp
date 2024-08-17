@@ -1,6 +1,6 @@
 import Tile from "../Tile/Tile";
 import "./Tileboard.css";
-import Logo from "../../assets/dashboard-icon.svg";
+import Logo from "../../assets/images.svg";
 
 const Tileboard = () => {
   //For now, later fetch from API

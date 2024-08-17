@@ -4,6 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { Difficulty } from './entities/difficulty.entity';
 import { Question } from './entities/question.entity';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -22,6 +26,15 @@ import { Question } from './entities/question.entity';
       }),
       inject: [ConfigService],
     }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      typePaths: ['./**/*.graphql'],
+      definitions: {
+        path: join(process.cwd(), 'src/schema-graphql.ts'),
+        outputAs: 'class',
+      },
+    }),
+    CategoriesModule,
   ],
   controllers: [],
   providers: [],

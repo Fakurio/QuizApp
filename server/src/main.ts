@@ -7,6 +7,9 @@ async function bootstrap() {
   app.enableCors({
     origin: 'http://localhost:5173',
   });
+  app.useStaticAssets(process.cwd() + '/src/icons', {
+    prefix: '/icons/',
+  });
   await app.listen(3000);
 }
 bootstrap();
