@@ -20,8 +20,8 @@ const Sidepanel = () => {
   return (
     <aside className="sidepanel">
       <div className="sidepanel__container">
-        {bookmarks.map((bookmark) => (
-          <Button text={bookmark.name} icon={bookmark.icon} />
+        {bookmarks.map((bookmark, index) => (
+          <Button text={bookmark.name} icon={bookmark.icon} key={index} />
         ))}
       </div>
     </aside>

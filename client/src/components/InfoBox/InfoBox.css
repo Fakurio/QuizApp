@@ -1,0 +1,17 @@
+.box {
+  padding: 30px;
+  border-radius: 5px;
+  font-weight: 500;
+  max-width: 300px;
+  overflow-wrap: break-word;
+}
+
+.info {
+  background-color: var(--accent-color);
+  color: var(--primary-color);
+}
+
+.error {
+  background-color: var(--error-color);
+  color: var(--primary-color);
+}
