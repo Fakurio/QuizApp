@@ -1,11 +1,12 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { seeder } from 'nestjs-seeder';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Category } from './entities/category.entity';
-import { Difficulty } from './entities/difficulty.entity';
-import { Question } from './entities/question.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Category } from '../entities/category.entity';
+import { Difficulty } from '../entities/difficulty.entity';
+import { Question } from '../entities/question.entity';
+import { CategoryQuestionSeeder } from './category-question.seeder';
 
-@Module({
+seeder({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
@@ -18,12 +19,9 @@ import { Question } from './entities/question.entity';
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
         entities: [Category, Difficulty, Question],
-        synchronize: true,
       }),
       inject: [ConfigService],
     }),
+    TypeOrmModule.forFeature([Category, Difficulty, Question]),
   ],
-  controllers: [],
-  providers: [],
-})
-export class AppModule {}
+}).run([CategoryQuestionSeeder]);
