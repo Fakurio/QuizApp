@@ -10,6 +10,21 @@ input GameInput {
   gameMode: GameMode!
 }
 
+type Answer {
+  correct: String!
+  incorrect: [String!]!
+}
+
+type Question {
+  gameCode: String!
+  name: String!
+  answer: Answer!
+}
+
 type Mutation {
   createGame(gameData: GameInput!): Boolean
+}
+
+type Subscription {
+  newQuestion(gameCode: String!): Question!
 }

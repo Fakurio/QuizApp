@@ -1,15 +1,18 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { CategoriesService } from 'src/categories/categories.service';
 import { CreateGameDTO } from './dto/create-game.dto';
 import { DifficultyEnum } from 'src/entities/difficulty.entity';
 import { Question } from 'src/entities/question.entity';
 import { ConfigService } from '@nestjs/config';
+import { PubSub } from 'graphql-subscriptions';
 
 @Injectable()
 export class GamesService {
   constructor(
     private categoryService: CategoriesService,
     private configService: ConfigService,
+    @Inject('PUB_SUB')
+    private pubSub: PubSub,
   ) {}
   async createGame(gameData: CreateGameDTO) {
     const questions = await this.categoryService.getQuestionsForCategory(
@@ -21,12 +24,13 @@ export class GamesService {
         'No questions found for this category and difficulty',
       );
     }
-    console.log('questions', questions);
     const randomQuestions = this.getRandomQuestions(
       questions,
       this.configService.get('QUESTIONS_PER_GAME'),
     );
-    console.log('randomQuestions', randomQuestions);
+    this.pubSub.publish('newQuestion', {
+      newQuestion: { ...randomQuestions[0], gameCode: gameData.gameCode },
+    });
   }
 
   private getRandomQuestions(questions: Question[], limit: number) {

@@ -37,8 +37,23 @@ export abstract class IQuery {
     abstract difficulties(): Difficulty[] | Promise<Difficulty[]>;
 }
 
+export class Answer {
+    correct: string;
+    incorrect: string[];
+}
+
+export class Question {
+    gameCode: string;
+    name: string;
+    answer: Answer;
+}
+
 export abstract class IMutation {
     abstract createGame(gameData: GameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
+}
+
+export abstract class ISubscription {
+    abstract newQuestion(gameCode: string): Question | Promise<Question>;
 }
 
 type Nullable<T> = T | null;
