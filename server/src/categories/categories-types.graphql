@@ -4,6 +4,12 @@ type Category {
   logo: String!
 }
 
+type Difficulty {
+  id: Int!
+  name: String!
+}
+
 type Query {
   categories: [Category!]!
+  difficulties: [Difficulty!]!
 }

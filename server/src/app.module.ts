@@ -8,6 +8,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { CategoriesModule } from './categories/categories.module';
+import { GamesModule } from './games/games.module';
 
 @Module({
   imports: [
@@ -33,8 +34,20 @@ import { CategoriesModule } from './categories/categories.module';
         path: join(process.cwd(), 'src/schema-graphql.ts'),
         outputAs: 'class',
       },
+      formatError: (error) => {
+        const originalError = error.extensions.originalError as Error;
+        if (originalError) {
+          return {
+            message: originalError.message,
+          };
+        }
+        return {
+          message: error.message,
+        };
+      },
     }),
     CategoriesModule,
+    GamesModule,
   ],
   controllers: [],
   providers: [],

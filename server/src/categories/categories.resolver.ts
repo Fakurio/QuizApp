@@ -10,4 +10,9 @@ export class CategoriesResolver {
   async getCategories() {
     return await this.categoriesService.getCategories();
   }
+
+  @Query('difficulties')
+  async getDifficulties() {
+    return await this.categoriesService.getDifficulties();
+  }
 }

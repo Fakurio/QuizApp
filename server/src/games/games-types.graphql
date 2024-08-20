@@ -1,0 +1,15 @@
+enum GameMode {
+  Solo
+  Multiplayer
+}
+
+input GameInput {
+  categoryName: String!
+  difficultyName: String!
+  gameCode: String!
+  gameMode: GameMode!
+}
+
+type Mutation {
+  createGame(gameData: GameInput!): Boolean
+}

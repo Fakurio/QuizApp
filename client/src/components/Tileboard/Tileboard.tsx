@@ -17,15 +17,24 @@ const CATEGORY_QUERY = gql`
 const Tileboard = () => {
   const { data, loading, error } = useQuery<GetCategoriesQuery>(CATEGORY_QUERY);
 
+  if (loading) {
+    return (
+      <div className="tileboard">
+        <InfoBox type="info" text="Loading..." />
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="tileboard">
+        <InfoBox type="error" text="Failed to fetch categories from server" />
+      </div>
+    );
+  }
   return (
     <div className="tileboard">
-      {loading && <InfoBox type="info" text="Loading..." />}
-      {error && (
-        <InfoBox type="error" text="Failed to fetch categories from server" />
-      )}
-      {!loading &&
-        !error &&
-        data!.categories.map((category) => (
+      {data &&
+        data.categories.map((category) => (
           <Tile
             category={category.name}
             icon={category.logo}
