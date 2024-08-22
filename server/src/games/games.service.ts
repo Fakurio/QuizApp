@@ -15,6 +15,7 @@ export class GamesService {
     private pubSub: PubSub,
   ) {}
   async createGame(gameData: CreateGameDTO) {
+    console.log(gameData);
     const questions = await this.categoryService.getQuestionsForCategory(
       gameData.categoryName,
       DifficultyEnum[gameData.difficultyName.toUpperCase()],
@@ -56,6 +57,7 @@ export class GamesService {
     duration = this.configService.get('ROUND_DURATION') * 1000 +
       this.configService.get('LATENCY_BUFFER') * 1000,
   ) {
+    console.log('Sending question');
     if (questionAmount) {
       this.pubSub.publish('newQuestion', {
         newQuestion: {

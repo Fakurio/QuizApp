@@ -30,6 +30,9 @@ import { GamesModule } from './games/games.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       installSubscriptionHandlers: true,
+      subscriptions: {
+        'graphql-ws': true,
+      },
       typePaths: ['./**/*.graphql'],
       definitions: {
         path: join(process.cwd(), 'src/schema-graphql.ts'),

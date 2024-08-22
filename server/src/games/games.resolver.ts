@@ -19,6 +19,8 @@ export class GamesResolver {
 
   @Subscription('newQuestion', {
     filter: (payload, variables) => {
+      console.log('payload', payload.newQuestion.gameCode);
+      console.log('variables', variables.gameCode);
       return payload.newQuestion.gameCode === variables.gameCode;
     },
   })
