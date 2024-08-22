@@ -1,0 +1,47 @@
+.pregame-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.pregame-form {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  background-color: var(--secondary-color);
+  border-radius: 5px;
+  padding: 2rem;
+}
+
+.pregame-form__heading:nth-of-type(2) {
+  margin-top: 2rem;
+}
+
+.pregame-form__section {
+  margin-top: 1rem;
+  border: none;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.pregame-form__section__button--active {
+  background-color: rgb(4, 251, 156);
+}
+
+.pregame-form__section button {
+  flex: 1;
+  width: auto;
+}
+
+.pregame-form__start {
+  margin-top: 3rem;
+  font-size: 1.2rem;
+}
+
+.pregame-form__error {
+  margin-top: 1rem;
+  padding: 0.4rem;
+}
