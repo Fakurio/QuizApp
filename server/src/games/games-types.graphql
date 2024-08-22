@@ -19,6 +19,9 @@ type Question {
   gameCode: String!
   name: String!
   answer: Answer!
+  startTime: String!
+  duration: Int!
+  questionAmount: Int
 }
 
 type Mutation {

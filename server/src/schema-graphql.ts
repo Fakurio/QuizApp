@@ -46,6 +46,9 @@ export class Question {
     gameCode: string;
     name: string;
     answer: Answer;
+    startTime: string;
+    duration: number;
+    questionAmount?: Nullable<number>;
 }
 
 export abstract class IMutation {

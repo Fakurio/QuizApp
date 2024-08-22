@@ -28,9 +28,49 @@ export class GamesService {
       questions,
       this.configService.get('QUESTIONS_PER_GAME'),
     );
-    this.pubSub.publish('newQuestion', {
-      newQuestion: { ...randomQuestions[0], gameCode: gameData.gameCode },
-    });
+    this.startGame(gameData.gameCode, randomQuestions);
+  }
+
+  private startGame(gameCode: string, questions: Question[]) {
+    this.sendQuestion(questions[0], gameCode, questions.length);
+    questions.shift();
+    const stopGameID = setInterval(
+      () => {
+        if (questions.length > 0) {
+          this.sendQuestion(questions[0], gameCode);
+          questions.shift();
+        } else {
+          clearInterval(stopGameID);
+        }
+      },
+      this.configService.get('ROUND_DURATION') * 1000 +
+        this.configService.get('LATENCY_BUFFER') * 1000,
+    );
+  }
+
+  private sendQuestion(
+    question: Question,
+    gameCode: string,
+    questionAmount?: number,
+    startTime: number = Date.now(),
+    duration = this.configService.get('ROUND_DURATION') * 1000 +
+      this.configService.get('LATENCY_BUFFER') * 1000,
+  ) {
+    if (questionAmount) {
+      this.pubSub.publish('newQuestion', {
+        newQuestion: {
+          ...question,
+          gameCode,
+          questionAmount,
+          startTime,
+          duration,
+        },
+      });
+    } else {
+      this.pubSub.publish('newQuestion', {
+        newQuestion: { ...question, gameCode, startTime, duration },
+      });
+    }
   }
 
   private getRandomQuestions(questions: Question[], limit: number) {
