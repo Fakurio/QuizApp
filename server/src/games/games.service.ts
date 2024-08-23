@@ -54,8 +54,8 @@ export class GamesService {
     gameCode: string,
     questionAmount?: number,
     startTime: number = Date.now(),
-    duration = this.configService.get('ROUND_DURATION') * 1000 +
-      this.configService.get('LATENCY_BUFFER') * 1000,
+    duration = +this.configService.get('ROUND_DURATION') +
+      +this.configService.get('LATENCY_BUFFER'),
   ) {
     console.log('Sending question');
     if (questionAmount) {
