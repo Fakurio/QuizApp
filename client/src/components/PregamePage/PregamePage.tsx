@@ -1,7 +1,7 @@
 import Button from "../Button/Button";
 import "./PregamePage.css";
 import { gql, useQuery } from "@apollo/client";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Navigate } from "react-router-dom";
 import { FormEvent, useState } from "react";
 import { InfoBox } from "../InfoBox/InfoBox";
 import { v4 as uuidv4 } from "uuid";
@@ -28,7 +28,7 @@ const PregamePage = () => {
   const navigate = useNavigate();
   const [gameData, setGameData] = useState<GameInput>({
     gameCode: uuidv4(),
-    categoryName: location.state.category,
+    categoryName: location.state?.category || "",
     difficultyName: "",
     gameMode: GameMode.Solo,
   });
@@ -52,6 +52,9 @@ const PregamePage = () => {
     navigate("/game", { state: { gameData } });
   };
 
+  if (location.state === null) {
+    return <Navigate to="/" />;
+  }
   return (
     <div className="pregame-container">
       <form className="pregame-form" onSubmit={(e) => startGame(e)}>
