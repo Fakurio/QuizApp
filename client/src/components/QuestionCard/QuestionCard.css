@@ -1,10 +1,9 @@
 .question-card {
-  border: 1px solid red;
   background-color: var(--secondary-color);
   border-radius: 5px;
   padding: 2rem;
-  margin-top: 3rem;
-  max-width: 600px;
+  margin-top: 2rem;
+  min-width: 100%;
 }
 
 .question-card__heading {
@@ -28,8 +27,21 @@
   font-size: 1.1rem;
   border-radius: 5px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
-.answer--selected {
-  background-color: var(--select-color);
+.answer--correct {
+  background-color: var(--good-color);
+}
+
+.answer--incorrect {
+  background-color: var(--error-color);
+}
+
+@media screen and (max-width: 600px) {
+  .question-card__answers {
+    display: flex;
+    flex-direction: column;
+  }
 }

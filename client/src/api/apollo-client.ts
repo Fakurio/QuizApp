@@ -4,12 +4,12 @@ import { createClient } from "graphql-ws";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 
 const httpLink = new HttpLink({
-  uri: `${import.meta.env.VITE_API_URL}/graphql`,
+  uri: `${import.meta.env.VITE_HTML_URL}/graphql`,
 });
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: `${import.meta.env.VITE_API_URL}/graphql`,
+    url: `${import.meta.env.VITE_WS_URL}/graphql`,
   })
 );
 

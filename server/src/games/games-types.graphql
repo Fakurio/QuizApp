@@ -21,11 +21,13 @@ type Question {
   answer: Answer!
   startTime: String!
   duration: Int!
+  latency: Int!
   questionAmount: Int
 }
 
 type Mutation {
   createGame(gameData: GameInput!): Boolean
+  stopGame(gameCode: String!): Boolean
 }
 
 type Subscription {

@@ -1,14 +1,21 @@
 import Button from "../Button/Button";
 import "./PregamePage.css";
-import { gql, useQuery } from "@apollo/client";
-import { useLocation, useNavigate, Navigate } from "react-router-dom";
-import { FormEvent, useState } from "react";
+import { gql, useQuery, useMutation } from "@apollo/client";
+import {
+  useLocation,
+  useNavigate,
+  Navigate,
+  useNavigationType,
+} from "react-router-dom";
+import { FormEvent, useEffect, useState } from "react";
 import { InfoBox } from "../InfoBox/InfoBox";
 import { v4 as uuidv4 } from "uuid";
 import {
   GameInput,
   GameMode,
   GetDifficultiesQuery,
+  StopGameMutation,
+  StopGameMutationVariables,
 } from "../../__generated__/graphql";
 import toFirstLetterUppercase from "../../utils/first-letter-uppercase";
 
@@ -21,13 +28,23 @@ const DIFFICULTY_QUERY = gql`
   }
 `;
 
+const STOP_GAME_MUTATION = gql`
+  mutation StopGame($gameCode: String!) {
+    stopGame(gameCode: $gameCode)
+  }
+`;
+
 const PregamePage = () => {
   const { data, loading, error } =
     useQuery<GetDifficultiesQuery>(DIFFICULTY_QUERY);
+  const [stopGame] = useMutation<StopGameMutation, StopGameMutationVariables>(
+    STOP_GAME_MUTATION
+  );
   const location = useLocation();
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
   const [gameData, setGameData] = useState<GameInput>({
-    gameCode: uuidv4(),
+    gameCode: "",
     categoryName: location.state?.category || "",
     difficultyName: "",
     gameMode: GameMode.Solo,
@@ -51,6 +68,26 @@ const PregamePage = () => {
     }
     navigate("/game", { state: { gameData } });
   };
+
+  useEffect(() => {
+    const savedGameCode = localStorage.getItem("gameCode");
+    if (!savedGameCode) {
+      const gameCode = uuidv4();
+      localStorage.setItem("gameCode", gameCode);
+      setGameData((prev) => ({ ...prev, gameCode }));
+    } else {
+      setGameData((prev) => ({ ...prev, gameCode: savedGameCode }));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (navigationType === "POP") {
+      const gameCode = localStorage.getItem("gameCode");
+      localStorage.removeItem("gameCode");
+      stopGame({ variables: { gameCode: gameCode! } });
+      navigate("/", { replace: true });
+    }
+  }, [location, navigationType]);
 
   if (location.state === null) {
     return <Navigate to="/" />;

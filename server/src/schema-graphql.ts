@@ -48,11 +48,14 @@ export class Question {
     answer: Answer;
     startTime: string;
     duration: number;
+    latency: number;
     questionAmount?: Nullable<number>;
 }
 
 export abstract class IMutation {
     abstract createGame(gameData: GameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
+
+    abstract stopGame(gameCode: string): Nullable<boolean> | Promise<Nullable<boolean>>;
 }
 
 export abstract class ISubscription {

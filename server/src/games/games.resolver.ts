@@ -17,10 +17,13 @@ export class GamesResolver {
     return this.gamesService.createGame(gameData);
   }
 
+  @Mutation('stopGame')
+  async stopGame(@Args('gameCode') gameCode: string) {
+    return this.gamesService.stopGame(gameCode);
+  }
+
   @Subscription('newQuestion', {
     filter: (payload, variables) => {
-      console.log('payload', payload.newQuestion.gameCode);
-      console.log('variables', variables.gameCode);
       return payload.newQuestion.gameCode === variables.gameCode;
     },
   })

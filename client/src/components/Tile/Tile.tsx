@@ -12,7 +12,7 @@ const Tile = ({ category, icon }: TileProps) => {
       <div className="tile">
         {icon && (
           <img
-            src={`${import.meta.env.VITE_API_URL}/icons/${icon}`}
+            src={`${import.meta.env.VITE_HTML_URL}/icons/${icon}`}
             className="tile__icon"
           />
         )}

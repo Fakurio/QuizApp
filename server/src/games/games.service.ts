@@ -8,14 +8,16 @@ import { PubSub } from 'graphql-subscriptions';
 
 @Injectable()
 export class GamesService {
+  private activeGames: Map<string, NodeJS.Timeout>;
   constructor(
     private categoryService: CategoriesService,
     private configService: ConfigService,
     @Inject('PUB_SUB')
     private pubSub: PubSub,
-  ) {}
+  ) {
+    this.activeGames = new Map();
+  }
   async createGame(gameData: CreateGameDTO) {
-    console.log(gameData);
     const questions = await this.categoryService.getQuestionsForCategory(
       gameData.categoryName,
       DifficultyEnum[gameData.difficultyName.toUpperCase()],
@@ -33,20 +35,41 @@ export class GamesService {
   }
 
   private startGame(gameCode: string, questions: Question[]) {
+    console.log('Gra start', gameCode);
+
     this.sendQuestion(questions[0], gameCode, questions.length);
     questions.shift();
-    const stopGameID = setInterval(
-      () => {
-        if (questions.length > 0) {
-          this.sendQuestion(questions[0], gameCode);
-          questions.shift();
-        } else {
-          clearInterval(stopGameID);
-        }
-      },
-      this.configService.get('ROUND_DURATION') * 1000 +
-        this.configService.get('LATENCY_BUFFER') * 1000,
-    );
+
+    let stopGameID: NodeJS.Timeout;
+
+    const sendNextQuestion = () => {
+      if (questions.length > 0) {
+        console.log('Następne pytanie', gameCode);
+        this.sendQuestion(questions[0], gameCode);
+        questions.shift();
+      } else {
+        console.log('Koniec gry', gameCode);
+        this.stopGame(gameCode);
+      }
+    };
+
+    const startQuestionTimer = () => {
+      stopGameID = setInterval(
+        sendNextQuestion,
+        this.configService.get('ROUND_DURATION') * 1000 +
+          this.configService.get('LATENCY_BUFFER') * 1000,
+      );
+      this.activeGames.set(gameCode, stopGameID);
+    };
+
+    startQuestionTimer();
+  }
+
+  stopGame(gameCode: string) {
+    console.log('Gra stop', gameCode);
+    clearInterval(this.activeGames.get(gameCode));
+    this.activeGames.delete(gameCode);
+    console.log(this.activeGames);
   }
 
   private sendQuestion(
@@ -54,10 +77,9 @@ export class GamesService {
     gameCode: string,
     questionAmount?: number,
     startTime: number = Date.now(),
-    duration = +this.configService.get('ROUND_DURATION') +
-      +this.configService.get('LATENCY_BUFFER'),
+    duration = +this.configService.get('ROUND_DURATION'),
+    latency = +this.configService.get('LATENCY_BUFFER'),
   ) {
-    console.log('Sending question');
     if (questionAmount) {
       this.pubSub.publish('newQuestion', {
         newQuestion: {
@@ -66,11 +88,12 @@ export class GamesService {
           questionAmount,
           startTime,
           duration,
+          latency,
         },
       });
     } else {
       this.pubSub.publish('newQuestion', {
-        newQuestion: { ...question, gameCode, startTime, duration },
+        newQuestion: { ...question, gameCode, startTime, duration, latency },
       });
     }
   }

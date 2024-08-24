@@ -2,4 +2,22 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.game-page__round-info {
+  /* border: 1px solid red; */
+  /* display: flex; */
+  min-width: 100%;
+  /* gap: 3rem; */
+  background-color: var(--secondary-color);
+  border-radius: 5px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.game-page__round-info__round {
+  font-size: 1.2rem;
 }
