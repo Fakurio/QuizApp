@@ -1,12 +1,10 @@
 import Tile from "../Tile/Tile";
 import "./Tileboard.css";
-import { useQuery } from "@apollo/client";
-import { GetCategoriesQuery } from "../../__generated__/graphql";
 import { InfoBox } from "../InfoBox/InfoBox";
-import { CATEGORY_QUERY } from "../../api/queries";
+import { useCategories } from "../../contexts/CategoriesContext";
 
 const Tileboard = () => {
-  const { data, loading, error } = useQuery<GetCategoriesQuery>(CATEGORY_QUERY);
+  const { filteredCategories, loading, error } = useCategories();
 
   if (loading) {
     return (
@@ -24,8 +22,8 @@ const Tileboard = () => {
   }
   return (
     <div className="tileboard">
-      {data &&
-        data.categories.map((category) => (
+      {filteredCategories &&
+        filteredCategories.map((category) => (
           <Tile
             category={category.name}
             icon={category.logo}
