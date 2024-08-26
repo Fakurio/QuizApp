@@ -37,8 +37,11 @@ export class GamesService {
 
   endRound(gameCode: string) {
     console.log('Koniec rundy', gameCode);
-    const interval = this.activeGames.get(gameCode).timerID;
-    clearInterval(interval);
+    const game = this.activeGames.get(gameCode);
+    if (!game) {
+      return;
+    }
+    clearInterval(game.timerID);
     this.sendNextQuestion(gameCode);
     this.startRoundTimer(gameCode);
   }

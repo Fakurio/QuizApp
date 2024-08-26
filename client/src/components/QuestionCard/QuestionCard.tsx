@@ -1,4 +1,5 @@
 import { OnNewQuestionSubscription } from "../../__generated__/graphql";
+import { sanitizeString } from "../../utils/sanitize-string";
 import shuffleArray from "../../utils/shuffle-array";
 import Button from "../Button/Button";
 import "./QuestionCard.css";
@@ -30,12 +31,12 @@ const QuestionCard = ({
   return (
     <div className="question-card">
       <h1 className="question-card__heading">
-        {question.name.replace(/&quot;/g, '"')}
+        {sanitizeString(question.name)}
       </h1>
       <div className="question-card__answers">
         {answers.map((answer, index) => (
           <Button
-            text={answer.replace(/&quot;/g, '"')}
+            text={sanitizeString(answer)}
             key={index}
             className={`question-card__answers__answer ${
               showCorrectAnswer && question.answer.correct === answer
