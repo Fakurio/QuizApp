@@ -22,6 +22,11 @@ export class GamesResolver {
     return this.gamesService.stopGame(gameCode);
   }
 
+  @Mutation('endRound')
+  async endRound(@Args('gameCode') gameCode: string) {
+    return this.gamesService.endRound(gameCode);
+  }
+
   @Subscription('newQuestion', {
     filter: (payload, variables) => {
       return payload.newQuestion.gameCode === variables.gameCode;

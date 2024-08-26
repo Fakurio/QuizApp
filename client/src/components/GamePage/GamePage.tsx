@@ -5,40 +5,28 @@ import {
   useNavigate,
   useNavigationType,
 } from "react-router-dom";
-import { gql, useMutation, useSubscription } from "@apollo/client";
+import { useMutation, useSubscription } from "@apollo/client";
 import {
   CreateGameMutation,
   CreateGameMutationVariables,
   OnNewQuestionSubscription,
   OnNewQuestionSubscriptionVariables,
+  EndRoundMutation,
+  EndRoundMutationVariables,
+  StopGameMutation,
+  StopGameMutationVariables,
 } from "../../__generated__/graphql";
 import QuestionCard from "../QuestionCard/QuestionCard";
 import { useEffect, useState, useRef } from "react";
 import Timer from "../Timer/Timer";
 import { InfoBox } from "../InfoBox/InfoBox";
 import GameSummary from "../GameSummary/GameSummary";
-
-const CREATE_GAME_MUTATION = gql`
-  mutation createGame($gameData: GameInput!) {
-    createGame(gameData: $gameData)
-  }
-`;
-
-const ON_NEW_QUESTION = gql`
-  subscription OnNewQuestion($gameCode: String!) {
-    newQuestion(gameCode: $gameCode) {
-      name
-      answer {
-        correct
-        incorrect
-      }
-      startTime
-      duration
-      latency
-      questionAmount
-    }
-  }
-`;
+import {
+  STOP_GAME_MUTATION,
+  CREATE_GAME_MUTATION,
+  END_ROUND_MUTATION,
+} from "../../api/mutations";
+import { ON_NEW_QUESTION } from "../../api/subscriptions";
 
 const GamePage = () => {
   const location = useLocation();
@@ -46,7 +34,9 @@ const GamePage = () => {
     CreateGameMutation,
     CreateGameMutationVariables
   >(CREATE_GAME_MUTATION);
-
+  const [endRound] = useMutation<EndRoundMutation, EndRoundMutationVariables>(
+    END_ROUND_MUTATION
+  );
   const { data, loading, error } = useSubscription<
     OnNewQuestionSubscription,
     OnNewQuestionSubscriptionVariables
@@ -55,6 +45,11 @@ const GamePage = () => {
       gameCode: location.state?.gameData.gameCode || "",
     },
   });
+  const [stopGame] = useMutation<StopGameMutation, StopGameMutationVariables>(
+    STOP_GAME_MUTATION
+  );
+  const navigate = useNavigate();
+  const navigationType = useNavigationType();
   const [showCorrectAnswer, setShowCorrectAnswer] = useState(false);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
@@ -62,7 +57,6 @@ const GamePage = () => {
   const questionAmount = useRef(0);
 
   const startGame = async () => {
-    console.log("Game page", location.state.gameData.gameCode);
     const gameData = location.state.gameData;
     try {
       await createGame({
@@ -79,6 +73,14 @@ const GamePage = () => {
     if (isCorrect) {
       playerPoints.current += 1;
     }
+    setShowCorrectAnswer(true);
+    setTimeout(() => {
+      endRound({
+        variables: {
+          gameCode: location.state.gameData.gameCode,
+        },
+      });
+    }, (data?.newQuestion.latency || 1) * 1000);
   };
 
   useEffect(() => {
@@ -87,6 +89,14 @@ const GamePage = () => {
     };
     waitForGameStart();
   }, []);
+
+  useEffect(() => {
+    if (navigationType === "POP" && !loading) {
+      const gameCode = location.state.gameData.gameCode;
+      stopGame({ variables: { gameCode } });
+      navigate("/", { replace: true });
+    }
+  }, [location, navigationType, loading]);
 
   useEffect(() => {
     if (data?.newQuestion) {
@@ -99,7 +109,9 @@ const GamePage = () => {
 
   useEffect(() => {
     if (questionNumber === questionAmount.current && showCorrectAnswer) {
-      setShowSummary(true);
+      setTimeout(() => {
+        setShowSummary(true);
+      }, (data?.newQuestion.latency || 1) * 1000);
     }
   }, [questionNumber, showCorrectAnswer, questionAmount]);
 

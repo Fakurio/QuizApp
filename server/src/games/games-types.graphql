@@ -28,6 +28,7 @@ type Question {
 type Mutation {
   createGame(gameData: GameInput!): Boolean
   stopGame(gameCode: String!): Boolean
+  endRound(gameCode: String!): Boolean
 }
 
 type Subscription {

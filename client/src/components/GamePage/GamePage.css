@@ -8,10 +8,7 @@
 }
 
 .game-page__round-info {
-  /* border: 1px solid red; */
-  /* display: flex; */
   min-width: 100%;
-  /* gap: 3rem; */
   background-color: var(--secondary-color);
   border-radius: 5px;
   padding: 1rem;

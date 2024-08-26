@@ -56,6 +56,8 @@ export abstract class IMutation {
     abstract createGame(gameData: GameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
 
     abstract stopGame(gameCode: string): Nullable<boolean> | Promise<Nullable<boolean>>;
+
+    abstract endRound(gameCode: string): Nullable<boolean> | Promise<Nullable<boolean>>;
 }
 
 export abstract class ISubscription {

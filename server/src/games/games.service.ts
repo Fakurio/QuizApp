@@ -5,10 +5,11 @@ import { DifficultyEnum } from 'src/entities/difficulty.entity';
 import { Question } from 'src/entities/question.entity';
 import { ConfigService } from '@nestjs/config';
 import { PubSub } from 'graphql-subscriptions';
+import { ActiveGame } from 'src/interfaces/active-game-interface';
 
 @Injectable()
 export class GamesService {
-  private activeGames: Map<string, NodeJS.Timeout>;
+  private activeGames: Map<string, ActiveGame>;
   constructor(
     private categoryService: CategoriesService,
     private configService: ConfigService,
@@ -34,42 +35,57 @@ export class GamesService {
     this.startGame(gameData.gameCode, randomQuestions);
   }
 
-  private startGame(gameCode: string, questions: Question[]) {
-    console.log('Gra start', gameCode);
-
-    this.sendQuestion(questions[0], gameCode, questions.length);
-    questions.shift();
-
-    let stopGameID: NodeJS.Timeout;
-
-    const sendNextQuestion = () => {
-      if (questions.length > 0) {
-        console.log('Następne pytanie', gameCode);
-        this.sendQuestion(questions[0], gameCode);
-        questions.shift();
-      } else {
-        console.log('Koniec gry', gameCode);
-        this.stopGame(gameCode);
-      }
-    };
-
-    const startQuestionTimer = () => {
-      stopGameID = setInterval(
-        sendNextQuestion,
-        this.configService.get('ROUND_DURATION') * 1000 +
-          this.configService.get('LATENCY_BUFFER') * 1000,
-      );
-      this.activeGames.set(gameCode, stopGameID);
-    };
-
-    startQuestionTimer();
+  endRound(gameCode: string) {
+    console.log('Koniec rundy', gameCode);
+    const interval = this.activeGames.get(gameCode).timerID;
+    clearInterval(interval);
+    this.sendNextQuestion(gameCode);
+    this.startRoundTimer(gameCode);
   }
 
   stopGame(gameCode: string) {
     console.log('Gra stop', gameCode);
-    clearInterval(this.activeGames.get(gameCode));
-    this.activeGames.delete(gameCode);
-    console.log(this.activeGames);
+    const game = this.activeGames.get(gameCode);
+    if (game) {
+      clearInterval(game.timerID);
+      this.activeGames.delete(gameCode);
+    }
+  }
+
+  private startGame(gameCode: string, questions: Question[]) {
+    console.log('Gra start', gameCode);
+    this.activeGames.set(gameCode, { questions, timerID: null });
+    this.sendNextQuestion(gameCode, questions.length);
+    this.startRoundTimer(gameCode);
+  }
+
+  private sendNextQuestion(gameCode: string, questionAmount?: number) {
+    const game = this.activeGames.get(gameCode);
+    if (!game) {
+      return;
+    }
+    const nextQuestion = game.questions.shift();
+    if (!nextQuestion) {
+      console.log('Koniec gry', gameCode);
+      this.stopGame(gameCode);
+      return;
+    }
+    console.log('Następne pytanie', gameCode);
+    this.sendQuestion(nextQuestion, gameCode, questionAmount);
+  }
+
+  private startRoundTimer(gameCode: string) {
+    if (!this.activeGames.get(gameCode)) {
+      return;
+    }
+    const stopRound = setInterval(
+      () => {
+        this.sendNextQuestion(gameCode);
+      },
+      this.configService.get('ROUND_DURATION') * 1000 +
+        this.configService.get('LATENCY_BUFFER') * 1000,
+    );
+    this.activeGames.get(gameCode).timerID = stopRound;
   }
 
   private sendQuestion(

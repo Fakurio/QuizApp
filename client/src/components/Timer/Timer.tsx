@@ -17,13 +17,12 @@ const Timer = ({
   const timeLeft =
     duration - Math.floor((Date.now() - parseInt(startTime)) / 1000);
   const [time, setTime] = useState(timeLeft);
-  let interval: NodeJS.Timeout;
 
   const startTimer = () => {
     if (onTimerStart) {
       onTimerStart();
     }
-    interval = setInterval(() => {
+    const interval = setInterval(() => {
       setTime((prevTime) => {
         if (prevTime <= 0) {
           if (onTimerEnd) {
@@ -36,9 +35,10 @@ const Timer = ({
         }
       });
     }, 1000);
+    return interval;
   };
   useEffect(() => {
-    startTimer();
+    const interval = startTimer();
     return () => clearInterval(interval);
   }, []);
   return <progress className="timer" max={duration} value={time}></progress>;

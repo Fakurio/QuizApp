@@ -1,6 +1,6 @@
 import Button from "../Button/Button";
 import "./PregamePage.css";
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import {
   useLocation,
   useNavigate,
@@ -18,21 +18,8 @@ import {
   StopGameMutationVariables,
 } from "../../__generated__/graphql";
 import toFirstLetterUppercase from "../../utils/first-letter-uppercase";
-
-const DIFFICULTY_QUERY = gql`
-  query GetDifficulties {
-    difficulties {
-      id
-      name
-    }
-  }
-`;
-
-const STOP_GAME_MUTATION = gql`
-  mutation StopGame($gameCode: String!) {
-    stopGame(gameCode: $gameCode)
-  }
-`;
+import { STOP_GAME_MUTATION } from "../../api/mutations";
+import { DIFFICULTY_QUERY } from "../../api/queries";
 
 const PregamePage = () => {
   const { data, loading, error } =
