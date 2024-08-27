@@ -9,6 +9,9 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { CategoriesModule } from './categories/categories.module';
 import { GamesModule } from './games/games.module';
+import { AuthModule } from './auth/auth.module';
+import { User } from './entities/user.entity';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -22,7 +25,7 @@ import { GamesModule } from './games/games.module';
         username: configService.get('DATABASE_USER'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [Category, Difficulty, Question],
+        entities: [Category, Difficulty, Question, User],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -52,6 +55,8 @@ import { GamesModule } from './games/games.module';
     }),
     CategoriesModule,
     GamesModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],
