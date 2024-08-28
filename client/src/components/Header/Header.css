@@ -15,15 +15,37 @@
   color: var(--accent-color);
 }
 
+.header__searchbar {
+  width: 100%;
+}
+
 @media screen and (max-width: 800px) {
   .header {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    gap: 0;
+    gap: 1rem;
   }
 
-  .header__login {
-    grid-column: 3 / 4;
+  .header__searchbar {
+    grid-row: 2 / 3;
+    grid-column: 1 / 4;
+  }
+}
+
+@media screen and (max-width: 470px) {
+  .header {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+  }
+
+  .header__user-info {
+    grid-row: 2 / 3;
+    grid-column: 1 / 4;
+  }
+
+  .header__searchbar {
+    grid-row: 3 / 4;
+    grid-column: 1 / 4;
   }
 }

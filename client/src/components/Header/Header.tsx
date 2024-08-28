@@ -1,8 +1,7 @@
 import "./Header.css";
 import Logo from "../../assets/logo.svg";
 import Searchbar from "../Searchbar/Searchbar";
-import Button from "../Button/Button";
-import { Link } from "react-router-dom";
+import UserInfo from "../UserInfo/UserInfo";
 
 const Header = () => {
   return (
@@ -11,12 +10,12 @@ const Header = () => {
         <img src={Logo}></img>
         <h1>QuizApp</h1>
       </div>
-      <Searchbar />
-      <Link to="/login">
-        <div className="header__login">
-          <Button text="Login" />
-        </div>
-      </Link>
+      <div className="header__searchbar">
+        <Searchbar />
+      </div>
+      <div className="header__user-info">
+        <UserInfo />
+      </div>
     </header>
   );
 };

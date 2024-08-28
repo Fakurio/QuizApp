@@ -11,6 +11,7 @@ interface AuthContextI {
   error: string | null;
   setError: (error: string | null) => void;
   login: (email: string, password: string) => Promise<void | User>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextI>({} as AuthContextI);
@@ -24,6 +25,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>("");
+
   const login = async (email: string, password: string) => {
     const response = await fetch(
       `${import.meta.env.VITE_HTML_URL}/auth/login`,
@@ -49,11 +51,33 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return user;
   };
 
+  const logout = async () => {
+    const response = await fetch(
+      `${import.meta.env.VITE_HTML_URL}/auth/logout`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${user?.accessToken}`,
+        },
+        credentials: "include",
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.log(error);
+      return;
+    }
+
+    setUser(null);
+  };
+
   const value = {
     user,
     error,
     setError,
     login,
+    logout,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
