@@ -1,0 +1,39 @@
+.login-form {
+  max-width: 400px;
+  margin: 0 auto;
+  background-color: var(--secondary-color);
+  padding: 2rem;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;
+}
+
+.login-form__section {
+  border: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form__section + .login-form__section {
+  margin-top: 2.5rem;
+}
+
+.login-form__section--buttons {
+  gap: 1rem;
+  margin-top: 2rem;
+  position: relative;
+}
+
+.login-form__paragraph {
+  margin-top: 1rem;
+}
+
+.login-form__paragraph a {
+  color: white;
+}
+
+.login-form__error {
+  max-width: 100%;
+  margin-top: 1rem;
+}
