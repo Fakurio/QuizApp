@@ -12,6 +12,7 @@ const UserInfo = () => {
         <div className="user-info">
           <img
             src={user.avatarUrl || AvatarPlaceholder}
+            referrerPolicy="no-referrer"
             className="user-info__avatar"
           />
           <p className="user-info__username">{user.username}</p>

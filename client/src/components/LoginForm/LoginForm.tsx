@@ -15,8 +15,12 @@ const LoginForm = () => {
     const password = e.currentTarget.password.value;
     const user = await login(email, password);
     if (user) {
-      navigate("/");
+      navigate("/", { replace: true });
     }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_HTML_URL}/auth/google/login`;
   };
 
   return (
@@ -41,13 +45,22 @@ const LoginForm = () => {
         Don't have an account?
         <Link to="/register"> Register</Link>
       </p>
-      {error && (
-        <InfoBox type="error" text={error} className="login-form__error" />
-      )}
+      {Array.isArray(error)
+        ? error.map((err, index) => (
+            <InfoBox
+              key={index}
+              type="error"
+              text={err}
+              className="login-form__error"
+            />
+          ))
+        : error && (
+            <InfoBox type="error" text={error} className="login-form__error" />
+          )}
       <fieldset className="login-form__section login-form__section--buttons">
         <Button text="Login" type="submit" />
         <hr />
-        <Button text="Login with Google" />
+        <Button text="Login with Google" onClick={() => handleGoogleLogin()} />
       </fieldset>
     </form>
   );

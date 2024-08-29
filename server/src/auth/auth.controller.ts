@@ -49,12 +49,15 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard('google'))
-  @Get()
+  @Get('google/login')
   async googleAuth() {}
 
   @UseGuards(AuthGuard('google'))
   @Get('google/redirect')
-  async googleRedirect(@Req() request: Request) {
-    return this.authService.googleLogin(request);
+  async googleRedirect(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return this.authService.googleLogin(request.user, response);
   }
 }

@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 interface User {
   username: string;
@@ -8,8 +9,14 @@ interface User {
 
 interface AuthContextI {
   user: User | null;
-  error: string | null;
+  setUser: (user: User) => void;
+  error: string | null | string[];
   setError: (error: string | null) => void;
+  register: (
+    email: string,
+    username: string,
+    password: string
+  ) => Promise<boolean | void>;
   login: (email: string, password: string) => Promise<void | User>;
   logout: () => void;
 }
@@ -24,7 +31,64 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState<string | null>("");
+  const [error, setError] = useState<string | null | string[]>("");
+  const location = useLocation();
+
+  useEffect(() => {
+    console.log("AuthProvider useEffect");
+    const refreshTokens = async () => {
+      if (user) return;
+      const response = await fetch(`${import.meta.env.VITE_HTML_URL}/auth/me`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const newUser = await response.json();
+      setUser(newUser);
+    };
+
+    const params = new URLSearchParams(location.search);
+    if (
+      !(
+        params.get("username") &&
+        params.get("accessToken") &&
+        params.get("avatarUrl")
+      )
+    ) {
+      refreshTokens();
+    }
+  }, []);
+
+  const register = async (
+    email: string,
+    username: string,
+    password: string
+  ) => {
+    const response = await fetch(
+      `${import.meta.env.VITE_HTML_URL}/auth/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, username, password }),
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      setError(error.message);
+      return;
+    }
+
+    const message = await response.json();
+    alert(message.message);
+    return true;
+  };
 
   const login = async (email: string, password: string) => {
     const response = await fetch(
@@ -74,8 +138,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const value = {
     user,
+    setUser,
     error,
     setError,
+    register,
     login,
     logout,
   };

@@ -62,13 +62,23 @@ export class AuthService {
     return user;
   }
 
+  async validateGoogleUser(email: string, username: string, avatarUrl: string) {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      const createdUser = await this.usersService.addUser({
+        type: 'google',
+        email,
+        username,
+        avatarUrl,
+      });
+      return createdUser;
+    } else {
+      return user;
+    }
+  }
+
   async loginUser(user: any, response: Response) {
-    const payload = { sub: user.id };
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
-    });
-    await this.usersService.updateRefreshToken(user.id, refreshToken);
+    const { accessToken, refreshToken } = await this.generateTokens(user);
     response.cookie('refresh_token', refreshToken, { httpOnly: true });
     return {
       username: user.username,
@@ -77,16 +87,12 @@ export class AuthService {
   }
 
   async me(user: any, response: Response) {
-    const payload = { sub: user.id };
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
-    });
-    await this.usersService.updateRefreshToken(user.id, refreshToken);
+    const { accessToken, refreshToken } = await this.generateTokens(user);
     response.cookie('refresh_token', refreshToken, { httpOnly: true });
     return {
       username: user.username,
       accessToken,
+      avatarUrl: user.avatarUrl,
     };
   }
 
@@ -98,13 +104,21 @@ export class AuthService {
     };
   }
 
-  async googleLogin(request: Request) {
-    if (!request.user) {
-      return 'No user from google';
-    }
-    return {
-      message: 'User information from google',
-      user: request.user,
-    };
+  async googleLogin(user: any, response: Response) {
+    const { accessToken, refreshToken } = await this.generateTokens(user);
+    response.cookie('refresh_token', refreshToken, { httpOnly: true });
+    response.redirect(
+      `http://localhost:5173/google/login?username=${user.username}&accessToken=${accessToken}&avatarUrl=${user.avatarUrl}`,
+    );
+  }
+
+  private async generateTokens(user: any) {
+    const payload = { sub: user.id };
+    const accessToken = this.jwtService.sign(payload);
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
+    });
+    await this.usersService.updateRefreshToken(user.id, refreshToken);
+    return { accessToken, refreshToken };
   }
 }

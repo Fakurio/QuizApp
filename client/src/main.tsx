@@ -8,12 +8,12 @@ import { AuthProvider } from "./contexts/AuthContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <ApolloProvider client={client}>
-    <AuthProvider>
-      <CategoriesProvider>
-        <BrowserRouter>
+    <CategoriesProvider>
+      <BrowserRouter>
+        <AuthProvider>
           <App />
-        </BrowserRouter>
-      </CategoriesProvider>
-    </AuthProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </CategoriesProvider>
   </ApolloProvider>
 );

@@ -4,6 +4,7 @@ import { RegisterUserDTO } from 'src/auth/dto/register-user.dto';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { hash } from 'bcrypt';
+import { GoogleUserDTO } from 'src/auth/dto/google-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -19,12 +20,17 @@ export class UsersService {
     return await this.usersRepository.findOne({ where: { id } });
   }
 
-  async addUser(registerUserDto: RegisterUserDTO) {
+  async addUser(userDto: RegisterUserDTO | GoogleUserDTO) {
     try {
       const user = new User();
-      user.email = registerUserDto.email;
-      user.username = registerUserDto.username;
-      user.password = await hash(registerUserDto.password, 10);
+      user.email = userDto.email;
+      user.username = userDto.username;
+      if (userDto.type === 'google') {
+        user.password = '';
+        user.avatarUrl = userDto.avatarUrl;
+      } else {
+        user.password = await hash(userDto.password, 10);
+      }
       return await this.usersRepository.save(user);
     } catch (error) {
       throw error;

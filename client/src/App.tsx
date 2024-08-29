@@ -5,6 +5,7 @@ import PregamePage from "./components/PregamePage/PregamePage";
 import GamePage from "./components/GamePage/GamePage";
 import RegisterForm from "./components/RegisterForm/RegisterForm";
 import LoginForm from "./components/LoginForm/LoginForm";
+import GoogleLoginPage from "./components/GoogleLoginPage/GoogleLoginPage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/game" Component={GamePage} />
         <Route path="/register" Component={RegisterForm} />
         <Route path="/login" Component={LoginForm} />
+        <Route path="/google/login" Component={GoogleLoginPage} />
       </Routes>
     </div>
   );
