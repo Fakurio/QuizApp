@@ -12,6 +12,8 @@ import { GamesModule } from './games/games.module';
 import { AuthModule } from './auth/auth.module';
 import { User } from './entities/user.entity';
 import { UsersModule } from './users/users.module';
+import { Game } from './entities/game.entity';
+import { GameQuestions } from './entities/game-questions.entity';
 
 @Module({
   imports: [
@@ -25,7 +27,7 @@ import { UsersModule } from './users/users.module';
         username: configService.get('DATABASE_USER'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [Category, Difficulty, Question, User],
+        entities: [Category, Difficulty, Question, User, Game, GameQuestions],
         synchronize: true,
       }),
       inject: [ConfigService],

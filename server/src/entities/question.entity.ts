@@ -1,6 +1,13 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Difficulty } from './difficulty.entity';
 import { Category } from './category.entity';
+import { GameQuestions } from './game-questions.entity';
 import { AnswerI } from 'src/interfaces/answer-interface';
 
 @Entity()
@@ -22,4 +29,7 @@ export class Question {
     onDelete: 'CASCADE',
   })
   category: Category;
+
+  @OneToMany(() => GameQuestions, (gameQuestions) => gameQuestions.question)
+  games: GameQuestions[];
 }

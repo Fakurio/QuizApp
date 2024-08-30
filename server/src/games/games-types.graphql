@@ -27,6 +27,8 @@ type Question {
 
 type Mutation {
   createGame(gameData: GameInput!): Boolean
+  createSoloGame(gameData: GameInput!): Boolean
+  createMutliplayerGame(gameData: GameInput!): Boolean
   stopGame(gameCode: String!): Boolean
   endRound(gameCode: String!): Boolean
 }

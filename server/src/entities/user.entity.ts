@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Game } from './game.entity';
 
 @Entity()
 export class User {
@@ -19,4 +20,10 @@ export class User {
 
   @Column({ nullable: true })
   refreshToken: string | null;
+
+  @OneToMany(() => Game, (game) => game.playerOne)
+  gamesAsPlayerOne: Game[];
+
+  @OneToMany(() => Game, (game) => game.playerTwo)
+  gamesAsPlayerTwo: Game[];
 }

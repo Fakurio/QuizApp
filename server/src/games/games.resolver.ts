@@ -1,8 +1,11 @@
 import { Mutation, Resolver, Args, Subscription } from '@nestjs/graphql';
-import { Inject } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { CreateGameDTO } from './dto/create-game.dto';
 import { PubSub } from 'graphql-subscriptions';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { User } from 'src/entities/user.entity';
+import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 
 @Resolver('Game')
 export class GamesResolver {
@@ -13,8 +16,17 @@ export class GamesResolver {
   ) {}
 
   @Mutation('createGame')
-  async createGame(@Args('gameData') gameData: CreateGameDTO) {
-    return this.gamesService.createGame(gameData);
+  async createAnonimousGame(@Args('gameData') gameData: CreateGameDTO) {
+    return this.gamesService.createGame(gameData, null);
+  }
+
+  @UseGuards(GqlAuthGuard)
+  @Mutation('createSoloGame')
+  async createSoloGame(
+    @Args('gameData') gameData: CreateGameDTO,
+    @CurrentUser() user: User,
+  ) {
+    return this.gamesService.createGame(gameData, user);
   }
 
   @Mutation('stopGame')

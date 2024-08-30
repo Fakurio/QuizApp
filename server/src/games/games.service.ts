@@ -6,6 +6,12 @@ import { Question } from 'src/entities/question.entity';
 import { ConfigService } from '@nestjs/config';
 import { PubSub } from 'graphql-subscriptions';
 import { ActiveGame } from 'src/interfaces/active-game-interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Game } from 'src/entities/game.entity';
+import { GameQuestions } from 'src/entities/game-questions.entity';
+import { Repository } from 'typeorm';
+import { User } from 'src/entities/user.entity';
+import { GameMode } from 'src/schema-graphql';
 
 @Injectable()
 export class GamesService {
@@ -13,26 +19,44 @@ export class GamesService {
   constructor(
     private categoryService: CategoriesService,
     private configService: ConfigService,
+
     @Inject('PUB_SUB')
     private pubSub: PubSub,
+
+    @InjectRepository(Game)
+    private gameRepository: Repository<Game>,
+
+    @InjectRepository(GameQuestions)
+    private gameQuestionsRepository: Repository<GameQuestions>,
   ) {
     this.activeGames = new Map();
   }
-  async createGame(gameData: CreateGameDTO) {
+  async createGame(gameData: CreateGameDTO, user: User | null) {
     const questions = await this.categoryService.getQuestionsForCategory(
       gameData.categoryName,
       DifficultyEnum[gameData.difficultyName.toUpperCase()],
     );
+
     if (questions.length === 0) {
       throw new BadRequestException(
         'No questions found for this category and difficulty',
       );
     }
+
     const randomQuestions = this.getRandomQuestions(
       questions,
       this.configService.get('QUESTIONS_PER_GAME'),
     );
-    this.startGame(gameData.gameCode, randomQuestions);
+
+    if (!user) {
+      //tak jak do tej pory
+      // this.startGame(gameData.gameCode, randomQuestions);
+    } else if (gameData.gameMode === GameMode.Solo) {
+      this.openSoloGame(gameData.gameCode, randomQuestions, user);
+    } else {
+      // this.openMultiplayerGame(gameData.gameCode, randomQuestions, user);
+    }
+    // this.startGame(gameData.gameCode, randomQuestions);
   }
 
   endRound(gameCode: string) {
@@ -53,6 +77,27 @@ export class GamesService {
       clearInterval(game.timerID);
       this.activeGames.delete(gameCode);
     }
+  }
+
+  private async openSoloGame(
+    gameCode: string,
+    questions: Question[],
+    user: User,
+  ) {
+    const game = new Game();
+    game.gameCode = gameCode;
+    game.playerOne = user;
+    game.isFinished = false;
+    const savedGame = await this.gameRepository.save(game);
+    for (const question of questions) {
+      const gameQuestion = new GameQuestions();
+      gameQuestion.game = savedGame;
+      gameQuestion.question = question;
+      const saveGameQuestion =
+        await this.gameQuestionsRepository.save(gameQuestion);
+      question.id = saveGameQuestion.id;
+    }
+    this.startGame(gameCode, questions);
   }
 
   private startGame(gameCode: string, questions: Question[]) {

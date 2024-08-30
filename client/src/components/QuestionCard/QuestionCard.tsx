@@ -22,6 +22,7 @@ const QuestionCard = ({
     );
   }, [question]);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+
   const handleAnswerSelection = (isCorrect: boolean, answer: string) => {
     if (selectedAnswer) return;
     setSelectedAnswer(answer);
