@@ -11,6 +11,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { RegisterUserDTO } from './dto/register-user.dto';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -48,11 +49,11 @@ export class AuthController {
     return this.authService.logoutUser(request.user, response);
   }
 
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleAuthGuard)
   @Get('google/login')
   async googleAuth() {}
 
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleAuthGuard)
   @Get('google/redirect')
   async googleRedirect(
     @Req() request: Request,
