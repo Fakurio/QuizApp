@@ -8,7 +8,7 @@ import { useState, useMemo } from "react";
 interface QuestionCardProps {
   question: OnNewQuestionSubscription["newQuestion"];
   showCorrectAnswer: boolean;
-  onAnswerSelection: (isCorrect: boolean, answer?: string) => void;
+  onAnswerSelection: (isCorrect: boolean, questionID: number) => void;
 }
 
 const QuestionCard = ({
@@ -23,10 +23,14 @@ const QuestionCard = ({
   }, [question]);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
 
-  const handleAnswerSelection = (isCorrect: boolean, answer: string) => {
+  const handleAnswerSelection = (
+    isCorrect: boolean,
+    answer: string,
+    questionID: number
+  ) => {
     if (selectedAnswer) return;
     setSelectedAnswer(answer);
-    onAnswerSelection(isCorrect, answer);
+    onAnswerSelection(isCorrect, questionID);
   };
 
   return (
@@ -52,7 +56,11 @@ const QuestionCard = ({
                 : ""
             }`}
             onClick={() =>
-              handleAnswerSelection(question.answer.correct === answer, answer)
+              handleAnswerSelection(
+                question.answer.correct === answer,
+                answer,
+                question.id
+              )
             }
           />
         ))}

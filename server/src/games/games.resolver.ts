@@ -6,6 +6,7 @@ import { PubSub } from 'graphql-subscriptions';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
+import { PlayerAnswers } from 'src/schema-graphql';
 
 @Resolver('Game')
 export class GamesResolver {
@@ -37,6 +38,16 @@ export class GamesResolver {
   @Mutation('endRound')
   async endRound(@Args('gameCode') gameCode: string) {
     return this.gamesService.endRound(gameCode);
+  }
+
+  @UseGuards(GqlAuthGuard)
+  @Mutation('sendGameSummary')
+  async sendGameSummary(
+    @CurrentUser() user: User,
+    @Args('gameCode') gameCode: string,
+    @Args('playerAnswers') playerAnswers: PlayerAnswers[],
+  ) {
+    console.log(user, gameCode, playerAnswers);
   }
 
   @Subscription('newQuestion', {

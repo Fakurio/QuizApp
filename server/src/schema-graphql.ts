@@ -20,6 +20,11 @@ export class GameInput {
     gameMode: GameMode;
 }
 
+export class PlayerAnswers {
+    questionID: number;
+    isCorrect: boolean;
+}
+
 export class Category {
     id: number;
     name: string;
@@ -43,6 +48,7 @@ export class Answer {
 }
 
 export class Question {
+    id: number;
     gameCode: string;
     name: string;
     answer: Answer;
@@ -58,6 +64,8 @@ export abstract class IMutation {
     abstract createSoloGame(gameData: GameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
 
     abstract createMutliplayerGame(gameData: GameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
+
+    abstract sendGameSummary(gameCode: string, playerAnswers: PlayerAnswers[]): Nullable<boolean> | Promise<Nullable<boolean>>;
 
     abstract stopGame(gameCode: string): Nullable<boolean> | Promise<Nullable<boolean>>;
 

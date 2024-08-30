@@ -15,6 +15,10 @@ import {
   EndRoundMutationVariables,
   StopGameMutation,
   StopGameMutationVariables,
+  GameMode,
+  CreateSoloGameMutationVariables,
+  CreateSoloGameMutation,
+  PlayerAnswers,
 } from "../../__generated__/graphql";
 import QuestionCard from "../QuestionCard/QuestionCard";
 import { useEffect, useState, useRef } from "react";
@@ -25,8 +29,10 @@ import {
   STOP_GAME_MUTATION,
   CREATE_GAME_MUTATION,
   END_ROUND_MUTATION,
+  CREATE_SOLO_GAME_MUTATION,
 } from "../../api/mutations";
 import { ON_NEW_QUESTION } from "../../api/subscriptions";
+import { useAuth } from "../../contexts/AuthContext";
 
 const GamePage = () => {
   const location = useLocation();
@@ -34,6 +40,11 @@ const GamePage = () => {
     CreateGameMutation,
     CreateGameMutationVariables
   >(CREATE_GAME_MUTATION);
+  const [createSoloGame] = useMutation<
+    CreateSoloGameMutation,
+    CreateSoloGameMutationVariables
+  >(CREATE_SOLO_GAME_MUTATION);
+
   const [endRound] = useMutation<EndRoundMutation, EndRoundMutationVariables>(
     END_ROUND_MUTATION
   );
@@ -48,32 +59,49 @@ const GamePage = () => {
   const [stopGame] = useMutation<StopGameMutation, StopGameMutationVariables>(
     STOP_GAME_MUTATION
   );
+  const { user } = useAuth();
   const navigate = useNavigate();
   const navigationType = useNavigationType();
   const [showCorrectAnswer, setShowCorrectAnswer] = useState(false);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
+  const [playerAnswers, setPlayerAnswers] = useState<PlayerAnswers[]>([]);
   const playerPoints = useRef(0);
   const questionAmount = useRef(0);
 
   const startGame = async () => {
     const gameData = location.state.gameData;
     try {
-      await createGame({
-        variables: {
-          gameData: gameData,
-        },
-      });
+      if (!user) {
+        await createGame({
+          variables: {
+            gameData: gameData,
+          },
+        });
+      } else if (gameData.gameMode === GameMode.Solo) {
+        await createSoloGame({
+          variables: {
+            gameData: gameData,
+          },
+        });
+      }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleAnswerSelection = (isCorrect: boolean, answer?: string) => {
+  const handleAnswerSelection = (isCorrect: boolean, questionID: number) => {
     if (isCorrect) {
       playerPoints.current += 1;
     }
     setShowCorrectAnswer(true);
+
+    if (location.state.gameData.gameMode === GameMode.Solo) {
+      setPlayerAnswers((prev) => {
+        return [...prev, { questionID, isCorrect }];
+      });
+    }
+
     setTimeout(() => {
       endRound({
         variables: {
@@ -138,7 +166,11 @@ const GamePage = () => {
   if (showSummary) {
     return (
       <div className="game-page">
-        <GameSummary playerPoints={playerPoints.current} />
+        <GameSummary
+          gameCode={location.state.gameData.gameCode}
+          playerPoints={playerPoints.current}
+          playerAnswers={playerAnswers}
+        />
       </div>
     );
   }
@@ -159,7 +191,7 @@ const GamePage = () => {
             />
           </div>
           <QuestionCard
-            key={data.newQuestion.name}
+            key={data.newQuestion.id}
             question={data.newQuestion}
             showCorrectAnswer={showCorrectAnswer}
             onAnswerSelection={handleAnswerSelection}

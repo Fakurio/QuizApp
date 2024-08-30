@@ -16,6 +16,7 @@ type Answer {
 }
 
 type Question {
+  id: Int!
   gameCode: String!
   name: String!
   answer: Answer!
@@ -25,10 +26,16 @@ type Question {
   questionAmount: Int
 }
 
+input PlayerAnswers {
+  questionID: Int!
+  isCorrect: Boolean!
+}
+
 type Mutation {
   createGame(gameData: GameInput!): Boolean
   createSoloGame(gameData: GameInput!): Boolean
   createMutliplayerGame(gameData: GameInput!): Boolean
+  sendGameSummary(gameCode: String!, playerAnswers: [PlayerAnswers!]!): Boolean
   stopGame(gameCode: String!): Boolean
   endRound(gameCode: String!): Boolean
 }

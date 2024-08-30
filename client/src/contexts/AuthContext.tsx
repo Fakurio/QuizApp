@@ -35,7 +35,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const location = useLocation();
 
   useEffect(() => {
-    console.log("AuthProvider useEffect");
     const refreshTokens = async () => {
       if (user) return;
       const response = await fetch(`${import.meta.env.VITE_HTML_URL}/auth/me`, {
