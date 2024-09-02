@@ -9,6 +9,7 @@ import {
 } from "../../__generated__/graphql";
 import { useMutation } from "@apollo/client";
 import { useEffect } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface GameSummaryProps {
   gameCode: string;
@@ -25,14 +26,26 @@ const GameSummary = ({
     SendGameSummaryMutation,
     SendGameSummaryMutationVariables
   >(SEND_GAME_SUMMARY_MUTATION);
+  const { refreshTokens } = useAuth();
 
   useEffect(() => {
-    sendGameSummary({
-      variables: {
-        gameCode: gameCode,
-        playerAnswers: playerAnswers,
-      },
-    });
+    const sendGameSummaryToServer = async () => {
+      try {
+        sendGameSummary({
+          variables: {
+            gameCode: gameCode,
+            playerAnswers: playerAnswers,
+          },
+        });
+      } catch (error: any) {
+        if (error.message === "Unauthorized") {
+          await refreshTokens();
+          sendGameSummaryToServer();
+        }
+      }
+    };
+
+    sendGameSummaryToServer();
   }, []);
 
   return (

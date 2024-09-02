@@ -59,7 +59,7 @@ const GamePage = () => {
   const [stopGame] = useMutation<StopGameMutation, StopGameMutationVariables>(
     STOP_GAME_MUTATION
   );
-  const { user } = useAuth();
+  const { user, refreshTokens } = useAuth();
   const navigate = useNavigate();
   const navigationType = useNavigationType();
   const [showCorrectAnswer, setShowCorrectAnswer] = useState(false);
@@ -85,8 +85,11 @@ const GamePage = () => {
           },
         });
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      if (error.message === "Unauthorized") {
+        await refreshTokens();
+        startGame();
+      }
     }
   };
 

@@ -19,6 +19,7 @@ interface AuthContextI {
   ) => Promise<boolean | void>;
   login: (email: string, password: string) => Promise<void | User>;
   logout: () => void;
+  refreshTokens: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextI>({} as AuthContextI);
@@ -34,22 +35,21 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<string | null | string[]>("");
   const location = useLocation();
 
+  const refreshTokens = async () => {
+    const response = await fetch(`${import.meta.env.VITE_HTML_URL}/auth/me`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    const newUser = await response.json();
+    setUser(newUser);
+  };
+
   useEffect(() => {
-    const refreshTokens = async () => {
-      if (user) return;
-      const response = await fetch(`${import.meta.env.VITE_HTML_URL}/auth/me`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        return;
-      }
-
-      const newUser = await response.json();
-      setUser(newUser);
-    };
-
     const params = new URLSearchParams(location.search);
     if (
       !(
@@ -143,6 +143,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     register,
     login,
     logout,
+    refreshTokens,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
