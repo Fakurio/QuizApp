@@ -85,11 +85,15 @@ export class GamesService {
     user: User,
     gameCode: string,
     playerAnswers: PlayerAnswers[],
+    playerScore: number,
   ) {
     const game = await this.gameRepository.findOne({
       relations: ['questions'],
       where: { gameCode },
     });
+    game.playerOneScore = playerScore;
+    game.isFinished = true;
+    await this.gameRepository.save(game);
     const gameQuestions = game.questions;
     for (const playerAnswer of playerAnswers) {
       const question = gameQuestions.find(

@@ -16,6 +16,7 @@ export class PlayerAnswers {
   @ManyToOne(
     () => GameQuestions,
     (gameQuestions) => gameQuestions.playerAnswers,
+    { onDelete: 'CASCADE' },
   )
   gameQuestion: GameQuestions;
 }

@@ -17,7 +17,7 @@ const documents = {
     "\n  mutation createGame($gameData: GameInput!) {\n    createGame(gameData: $gameData)\n  }\n": types.CreateGameDocument,
     "\n  mutation endRound($gameCode: String!) {\n    endRound(gameCode: $gameCode)\n  }\n": types.EndRoundDocument,
     "\n  mutation createSoloGame($gameData: GameInput!) {\n    createSoloGame(gameData: $gameData)\n  }\n": types.CreateSoloGameDocument,
-    "\n  mutation sendGameSummary(\n    $gameCode: String!\n    $playerAnswers: [PlayerAnswers!]!\n  ) {\n    sendGameSummary(gameCode: $gameCode, playerAnswers: $playerAnswers)\n  }\n": types.SendGameSummaryDocument,
+    "\n  mutation sendGameSummary(\n    $gameCode: String!\n    $playerAnswers: [PlayerAnswers!]!\n    $playerScore: Int!\n  ) {\n    sendGameSummary(\n      gameCode: $gameCode\n      playerAnswers: $playerAnswers\n      playerScore: $playerScore\n    )\n  }\n": types.SendGameSummaryDocument,
     "\n  query GetDifficulties {\n    difficulties {\n      id\n      name\n    }\n  }\n": types.GetDifficultiesDocument,
     "\n  query GetCategories {\n    categories {\n      id\n      name\n      logo\n    }\n  }\n": types.GetCategoriesDocument,
     "\n  subscription OnNewQuestion($gameCode: String!) {\n    newQuestion(gameCode: $gameCode) {\n      id\n      name\n      answer {\n        correct\n        incorrect\n      }\n      startTime\n      duration\n      latency\n      questionAmount\n    }\n  }\n": types.OnNewQuestionDocument,
@@ -56,7 +56,7 @@ export function gql(source: "\n  mutation createSoloGame($gameData: GameInput!) 
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation sendGameSummary(\n    $gameCode: String!\n    $playerAnswers: [PlayerAnswers!]!\n  ) {\n    sendGameSummary(gameCode: $gameCode, playerAnswers: $playerAnswers)\n  }\n"): (typeof documents)["\n  mutation sendGameSummary(\n    $gameCode: String!\n    $playerAnswers: [PlayerAnswers!]!\n  ) {\n    sendGameSummary(gameCode: $gameCode, playerAnswers: $playerAnswers)\n  }\n"];
+export function gql(source: "\n  mutation sendGameSummary(\n    $gameCode: String!\n    $playerAnswers: [PlayerAnswers!]!\n    $playerScore: Int!\n  ) {\n    sendGameSummary(\n      gameCode: $gameCode\n      playerAnswers: $playerAnswers\n      playerScore: $playerScore\n    )\n  }\n"): (typeof documents)["\n  mutation sendGameSummary(\n    $gameCode: String!\n    $playerAnswers: [PlayerAnswers!]!\n    $playerScore: Int!\n  ) {\n    sendGameSummary(\n      gameCode: $gameCode\n      playerAnswers: $playerAnswers\n      playerScore: $playerScore\n    )\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

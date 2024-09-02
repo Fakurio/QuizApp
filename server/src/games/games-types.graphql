@@ -35,7 +35,11 @@ type Mutation {
   createGame(gameData: GameInput!): Boolean
   createSoloGame(gameData: GameInput!): Boolean
   createMutliplayerGame(gameData: GameInput!): Boolean
-  sendGameSummary(gameCode: String!, playerAnswers: [PlayerAnswers!]!): Boolean
+  sendGameSummary(
+    gameCode: String!
+    playerAnswers: [PlayerAnswers!]!
+    playerScore: Int!
+  ): Boolean
   stopGame(gameCode: String!): Boolean
   endRound(gameCode: String!): Boolean
 }

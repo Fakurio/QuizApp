@@ -27,7 +27,12 @@ export const SEND_GAME_SUMMARY_MUTATION = gql`
   mutation sendGameSummary(
     $gameCode: String!
     $playerAnswers: [PlayerAnswers!]!
+    $playerScore: Int!
   ) {
-    sendGameSummary(gameCode: $gameCode, playerAnswers: $playerAnswers)
+    sendGameSummary(
+      gameCode: $gameCode
+      playerAnswers: $playerAnswers
+      playerScore: $playerScore
+    )
   }
 `;

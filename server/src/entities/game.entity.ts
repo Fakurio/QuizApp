@@ -19,6 +19,12 @@ export class Game {
   @Column()
   isFinished: boolean;
 
+  @Column({ default: 0 })
+  playerOneScore: number;
+
+  @Column({ default: 0 })
+  playerTwoScore: number;
+
   @ManyToOne(() => User, (user) => user.gamesAsPlayerOne)
   playerOne: User;
 

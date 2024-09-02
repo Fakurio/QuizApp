@@ -35,6 +35,7 @@ const GameSummary = ({
           variables: {
             gameCode: gameCode,
             playerAnswers: playerAnswers,
+            playerScore: playerPoints,
           },
         });
       } catch (error: any) {

@@ -65,7 +65,7 @@ export abstract class IMutation {
 
     abstract createMutliplayerGame(gameData: GameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
 
-    abstract sendGameSummary(gameCode: string, playerAnswers: PlayerAnswers[]): Nullable<boolean> | Promise<Nullable<boolean>>;
+    abstract sendGameSummary(gameCode: string, playerAnswers: PlayerAnswers[], playerScore: number): Nullable<boolean> | Promise<Nullable<boolean>>;
 
     abstract stopGame(gameCode: string): Nullable<boolean> | Promise<Nullable<boolean>>;
 
