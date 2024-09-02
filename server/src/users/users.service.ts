@@ -40,4 +40,29 @@ export class UsersService {
   async updateRefreshToken(userID: number, refreshToken: string) {
     return await this.usersRepository.update(userID, { refreshToken });
   }
+
+  async getUserGamesHistory(user: User) {
+    return await this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoin('user.gamesAsPlayerOne', 'soloGames')
+      .leftJoin('soloGames.questions', 'soloGameQuestions')
+      .leftJoin(
+        'soloGameQuestions.playerAnswers',
+        'soloGameQuestionsPlayerAnswers',
+      )
+      .leftJoin('soloGameQuestions.question', 'soloGameQuestionsQuestion')
+      .leftJoin(
+        'soloGameQuestionsQuestion.category',
+        'soloGameQuestionsQuestionCategory',
+      )
+      .select([
+        'soloGames.id as gameID',
+        'soloGameQuestionsQuestionCategory.name as categoryName',
+        'soloGameQuestionsQuestion.name as questionName',
+        'soloGameQuestionsPlayerAnswers.isCorrect as isCorrectlyAnswered',
+      ])
+      .where('user.id = :id', { id: user.id })
+      .andWhere('soloGames.isFinished = :isFinished', { isFinished: true })
+      .getRawMany();
+  }
 }

@@ -30,6 +30,7 @@ const GameSummary = ({
 
   useEffect(() => {
     const sendGameSummaryToServer = async () => {
+      localStorage.removeItem("gameCode");
       try {
         sendGameSummary({
           variables: {

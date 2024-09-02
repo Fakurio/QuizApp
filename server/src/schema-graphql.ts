@@ -40,6 +40,8 @@ export abstract class IQuery {
     abstract categories(): Category[] | Promise<Category[]>;
 
     abstract difficulties(): Difficulty[] | Promise<Difficulty[]>;
+
+    abstract getUserGamesHistory(): History[] | Promise<History[]>;
 }
 
 export class Answer {
@@ -74,6 +76,17 @@ export abstract class IMutation {
 
 export abstract class ISubscription {
     abstract newQuestion(gameCode: string): Question | Promise<Question>;
+}
+
+export class HistoryQuestion {
+    questionName: string;
+    isCorrectlyAnswered: boolean;
+}
+
+export class History {
+    id: number;
+    categoryName: string;
+    questions: HistoryQuestion[];
 }
 
 type Nullable<T> = T | null;

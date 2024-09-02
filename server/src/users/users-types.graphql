@@ -1,0 +1,14 @@
+type HistoryQuestion {
+  questionName: String!
+  isCorrectlyAnswered: Boolean!
+}
+
+type History {
+  id: Int!
+  categoryName: String!
+  questions: [HistoryQuestion!]!
+}
+
+type Query {
+  getUserGamesHistory: [History!]!
+}
