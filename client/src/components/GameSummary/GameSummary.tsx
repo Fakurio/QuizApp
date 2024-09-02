@@ -27,7 +27,6 @@ const GameSummary = ({
   >(SEND_GAME_SUMMARY_MUTATION);
 
   useEffect(() => {
-    console.log("Wysyłam odpowiedzi gracza", playerAnswers);
     sendGameSummary({
       variables: {
         gameCode: gameCode,

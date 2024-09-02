@@ -1,6 +1,7 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Game } from './game.entity';
 import { Question } from './question.entity';
+import { PlayerAnswers } from './player-answers.entity';
 
 @Entity()
 export class GameQuestions {
@@ -14,4 +15,7 @@ export class GameQuestions {
     onDelete: 'CASCADE',
   })
   question: Question;
+
+  @OneToMany(() => PlayerAnswers, (playerAnswers) => playerAnswers.gameQuestion)
+  playerAnswers: PlayerAnswers[];
 }

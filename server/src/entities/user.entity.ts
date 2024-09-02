@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Game } from './game.entity';
+import { PlayerAnswers } from './player-answers.entity';
 
 @Entity()
 export class User {
@@ -26,4 +27,7 @@ export class User {
 
   @OneToMany(() => Game, (game) => game.playerTwo)
   gamesAsPlayerTwo: Game[];
+
+  @OneToMany(() => PlayerAnswers, (playerAnswers) => playerAnswers.player)
+  playerAnswers: PlayerAnswers[];
 }

@@ -11,7 +11,8 @@ import { Game } from 'src/entities/game.entity';
 import { GameQuestions } from 'src/entities/game-questions.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/entities/user.entity';
-import { GameMode } from 'src/schema-graphql';
+import { GameMode, PlayerAnswers } from 'src/schema-graphql';
+import { PlayerAnswers as PlayerAnswersEntity } from 'src/entities/player-answers.entity';
 
 @Injectable()
 export class GamesService {
@@ -28,6 +29,9 @@ export class GamesService {
 
     @InjectRepository(GameQuestions)
     private gameQuestionsRepository: Repository<GameQuestions>,
+
+    @InjectRepository(PlayerAnswersEntity)
+    private playerAnswersRepository: Repository<PlayerAnswersEntity>,
   ) {
     this.activeGames = new Map();
   }
@@ -49,14 +53,12 @@ export class GamesService {
     );
 
     if (!user) {
-      //tak jak do tej pory
-      // this.startGame(gameData.gameCode, randomQuestions);
+      this.startGame(gameData.gameCode, randomQuestions);
     } else if (gameData.gameMode === GameMode.Solo) {
       this.openSoloGame(gameData.gameCode, randomQuestions, user);
     } else {
       // this.openMultiplayerGame(gameData.gameCode, randomQuestions, user);
     }
-    // this.startGame(gameData.gameCode, randomQuestions);
   }
 
   endRound(gameCode: string) {
@@ -76,6 +78,28 @@ export class GamesService {
     if (game) {
       clearInterval(game.timerID);
       this.activeGames.delete(gameCode);
+    }
+  }
+
+  async savePlayerAnswers(
+    user: User,
+    gameCode: string,
+    playerAnswers: PlayerAnswers[],
+  ) {
+    const game = await this.gameRepository.findOne({
+      relations: ['questions'],
+      where: { gameCode },
+    });
+    const gameQuestions = game.questions;
+    for (const playerAnswer of playerAnswers) {
+      const question = gameQuestions.find(
+        (q) => q.id === playerAnswer.questionID,
+      );
+      const answer = new PlayerAnswersEntity();
+      answer.gameQuestion = question;
+      answer.isCorrect = playerAnswer.isCorrect;
+      answer.player = user;
+      await this.playerAnswersRepository.save(answer);
     }
   }
 

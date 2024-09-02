@@ -47,7 +47,7 @@ export class GamesResolver {
     @Args('gameCode') gameCode: string,
     @Args('playerAnswers') playerAnswers: PlayerAnswers[],
   ) {
-    console.log(user, gameCode, playerAnswers);
+    return this.gamesService.savePlayerAnswers(user, gameCode, playerAnswers);
   }
 
   @Subscription('newQuestion', {
