@@ -8,7 +8,6 @@ import { PubSub } from 'graphql-subscriptions';
 import { ActiveGame } from 'src/interfaces/active-game-interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from 'src/entities/game.entity';
-import { GameQuestions } from 'src/entities/game-questions.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/entities/user.entity';
 import { GameMode, PlayerAnswers } from 'src/schema-graphql';
@@ -26,9 +25,6 @@ export class GamesService {
 
     @InjectRepository(Game)
     private gameRepository: Repository<Game>,
-
-    @InjectRepository(GameQuestions)
-    private gameQuestionsRepository: Repository<GameQuestions>,
 
     @InjectRepository(PlayerAnswersEntity)
     private playerAnswersRepository: Repository<PlayerAnswersEntity>,
@@ -55,7 +51,12 @@ export class GamesService {
     if (!user) {
       this.startGame(gameData.gameCode, randomQuestions);
     } else if (gameData.gameMode === GameMode.Solo) {
-      this.openSoloGame(gameData.gameCode, randomQuestions, user);
+      this.openSoloGame(
+        gameData.gameCode,
+        randomQuestions,
+        user,
+        gameData.categoryName,
+      );
     } else {
       // this.openMultiplayerGame(gameData.gameCode, randomQuestions, user);
     }
@@ -88,21 +89,19 @@ export class GamesService {
     playerScore: number,
   ) {
     const game = await this.gameRepository.findOne({
-      relations: ['questions'],
       where: { gameCode },
     });
     game.playerOneScore = playerScore;
     game.isFinished = true;
     await this.gameRepository.save(game);
-    const gameQuestions = game.questions;
     for (const playerAnswer of playerAnswers) {
-      const question = gameQuestions.find(
-        (q) => q.id === playerAnswer.questionID,
-      );
       const answer = new PlayerAnswersEntity();
-      answer.gameQuestion = question;
+      answer.game = game;
       answer.isCorrect = playerAnswer.isCorrect;
       answer.player = user;
+      answer.question = await this.categoryService.getQuestionByID(
+        playerAnswer.questionID,
+      );
       await this.playerAnswersRepository.save(answer);
     }
   }
@@ -111,20 +110,14 @@ export class GamesService {
     gameCode: string,
     questions: Question[],
     user: User,
+    categoryName: string,
   ) {
     const game = new Game();
     game.gameCode = gameCode;
     game.playerOne = user;
     game.isFinished = false;
-    const savedGame = await this.gameRepository.save(game);
-    for (const question of questions) {
-      const gameQuestion = new GameQuestions();
-      gameQuestion.game = savedGame;
-      gameQuestion.question = question;
-      const saveGameQuestion =
-        await this.gameQuestionsRepository.save(gameQuestion);
-      question.id = saveGameQuestion.id;
-    }
+    game.category = await this.categoryService.getCategoryByName(categoryName);
+    await this.gameRepository.save(game);
     this.startGame(gameCode, questions);
   }
 

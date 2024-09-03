@@ -13,7 +13,6 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './entities/user.entity';
 import { UsersModule } from './users/users.module';
 import { Game } from './entities/game.entity';
-import { GameQuestions } from './entities/game-questions.entity';
 import { PlayerAnswers } from './entities/player-answers.entity';
 
 @Module({
@@ -28,15 +27,7 @@ import { PlayerAnswers } from './entities/player-answers.entity';
         username: configService.get('DATABASE_USER'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [
-          Category,
-          Difficulty,
-          Question,
-          User,
-          Game,
-          GameQuestions,
-          PlayerAnswers,
-        ],
+        entities: [Category, Difficulty, Question, User, Game, PlayerAnswers],
         synchronize: true,
       }),
       inject: [ConfigService],

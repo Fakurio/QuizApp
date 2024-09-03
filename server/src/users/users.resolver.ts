@@ -14,10 +14,10 @@ export class UsersResolver {
   async getUserGamesHistory(@CurrentUser() user: User) {
     const rawResult = await this.usersService.getUserGamesHistory(user);
     const history = rawResult.reduce((acc, row) => {
-      const { gameID, categoryName, questionName, isCorrectlyAnswered } = row;
-      let game = acc.find((item) => item.id === gameID);
+      const { id, categoryName, questionName, isCorrectlyAnswered } = row;
+      let game = acc.find((item) => item.id === id);
       if (!game) {
-        game = { id: gameID, questions: [], categoryName };
+        game = { id, questions: [], categoryName };
         acc.push(game);
       } else {
         game.questions.push({ questionName, isCorrectlyAnswered });

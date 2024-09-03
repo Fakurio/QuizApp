@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
-import { GameQuestions } from './game-questions.entity';
+import { Question } from './question.entity';
+import { Game } from './game.entity';
 
 @Entity()
 export class PlayerAnswers {
@@ -13,10 +14,9 @@ export class PlayerAnswers {
   @ManyToOne(() => User, (user) => user.playerAnswers)
   player: User;
 
-  @ManyToOne(
-    () => GameQuestions,
-    (gameQuestions) => gameQuestions.playerAnswers,
-    { onDelete: 'CASCADE' },
-  )
-  gameQuestion: GameQuestions;
+  @ManyToOne(() => Question, (question) => question.playerAnswers)
+  question: Question;
+
+  @ManyToOne(() => Game, (game) => game.playerAnswers, { onDelete: 'CASCADE' })
+  game: Game;
 }

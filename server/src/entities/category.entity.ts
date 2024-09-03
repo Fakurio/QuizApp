@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Question } from './question.entity';
+import { Game } from './game.entity';
 
 @Entity()
 export class Category {
@@ -13,4 +14,7 @@ export class Category {
     cascade: ['insert'],
   })
   questions: Question[];
+
+  @OneToMany(() => Game, (game) => game.category)
+  games: Game[];
 }

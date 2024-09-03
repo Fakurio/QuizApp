@@ -37,4 +37,12 @@ export class CategoriesService {
       .andWhere('difficulty.name = :difficultyName', { difficultyName })
       .getMany();
   }
+
+  async getQuestionByID(id: number) {
+    return await this.questionRepository.findOne({ where: { id } });
+  }
+
+  async getCategoryByName(name: string) {
+    return await this.categoryRepository.findOne({ where: { name } });
+  }
 }

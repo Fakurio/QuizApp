@@ -127,9 +127,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     );
 
     if (!response.ok) {
-      const error = await response.json();
-      console.log(error);
-      return;
+      await refreshTokens();
+      logout();
     }
 
     setUser(null);

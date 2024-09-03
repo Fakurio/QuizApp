@@ -6,7 +6,8 @@ import {
   OneToMany,
 } from 'typeorm';
 import { User } from './user.entity';
-import { GameQuestions } from './game-questions.entity';
+import { Category } from './category.entity';
+import { PlayerAnswers } from './player-answers.entity';
 
 @Entity()
 export class Game {
@@ -31,6 +32,9 @@ export class Game {
   @ManyToOne(() => User, (user) => user.gamesAsPlayerTwo)
   playerTwo: User;
 
-  @OneToMany(() => GameQuestions, (gameQuestions) => gameQuestions.game)
-  questions: GameQuestions[];
+  @ManyToOne(() => Category, (category) => category.games)
+  category: Category;
+
+  @OneToMany(() => PlayerAnswers, (playerAnswer) => playerAnswer.game)
+  playerAnswers: PlayerAnswers[];
 }

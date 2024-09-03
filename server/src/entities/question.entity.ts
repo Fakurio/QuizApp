@@ -7,8 +7,8 @@ import {
 } from 'typeorm';
 import { Difficulty } from './difficulty.entity';
 import { Category } from './category.entity';
-import { GameQuestions } from './game-questions.entity';
 import { AnswerI } from 'src/interfaces/answer-interface';
+import { PlayerAnswers } from './player-answers.entity';
 
 @Entity()
 export class Question {
@@ -30,6 +30,6 @@ export class Question {
   })
   category: Category;
 
-  @OneToMany(() => GameQuestions, (gameQuestions) => gameQuestions.question)
-  games: GameQuestions[];
+  @OneToMany(() => PlayerAnswers, (playerAnswer) => playerAnswer.question)
+  playerAnswers: PlayerAnswers[];
 }

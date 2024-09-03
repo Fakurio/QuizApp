@@ -42,27 +42,40 @@ export class UsersService {
   }
 
   async getUserGamesHistory(user: User) {
-    return await this.usersRepository
+    const soloGames = await this.usersRepository
       .createQueryBuilder('user')
       .leftJoin('user.gamesAsPlayerOne', 'soloGames')
-      .leftJoin('soloGames.questions', 'soloGameQuestions')
-      .leftJoin(
-        'soloGameQuestions.playerAnswers',
-        'soloGameQuestionsPlayerAnswers',
-      )
-      .leftJoin('soloGameQuestions.question', 'soloGameQuestionsQuestion')
-      .leftJoin(
-        'soloGameQuestionsQuestion.category',
-        'soloGameQuestionsQuestionCategory',
-      )
+      .leftJoin('soloGames.category', 'category')
+      .leftJoin('soloGames.playerAnswers', 'soloGamePlayerAnswers')
+      .leftJoin('soloGamePlayerAnswers.question', 'soloGameQuestion')
       .select([
-        'soloGames.id as gameID',
-        'soloGameQuestionsQuestionCategory.name as categoryName',
-        'soloGameQuestionsQuestion.name as questionName',
-        'soloGameQuestionsPlayerAnswers.isCorrect as isCorrectlyAnswered',
+        'soloGames.id as id',
+        'category.name as categoryName',
+        'soloGameQuestion.name as questionName',
+        'soloGamePlayerAnswers.isCorrect as isCorrectlyAnswered',
       ])
       .where('user.id = :id', { id: user.id })
       .andWhere('soloGames.isFinished = :isFinished', { isFinished: true })
       .getRawMany();
+    // const multiplayerGames = await this.usersRepository
+    //   .createQueryBuilder('user')
+    //   .leftJoin('user.gamesAsPlayerTwo', 'multiGames')
+    //   .innerJoin('multiGames.playerOne', 'playerOne')
+    //   .leftJoin('multiGames.category', 'category')
+    //   .leftJoin('multiGames.playerAnswers', 'multiGamePlayerAnswers')
+    //   .leftJoin('multiGamePlayerAnswers.question', 'multiGameQuestion')
+    //   .select([
+    //     'multiGames.id as id',
+    //     'category.name as categoryName',
+    //     'multiGameQuestion.name as questionName',
+    //     'multiGamePlayerAnswers.isCorrect as isCorrectlyAnswered',
+    //     'playerOne.username as opponentUsername',
+    //   ])
+    //   .where('user.id = :id', { id: user.id })
+    //   .andWhere('multiGames.isFinished = :isFinished', { isFinished: true })
+    //   .getRawMany();
+
+    // console.log(multiplayerGames);
+    return soloGames;
   }
 }
