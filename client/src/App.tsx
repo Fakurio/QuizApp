@@ -6,6 +6,7 @@ import GamePage from "./components/GamePage/GamePage";
 import RegisterForm from "./components/RegisterForm/RegisterForm";
 import LoginForm from "./components/LoginForm/LoginForm";
 import GoogleLoginPage from "./components/GoogleLoginPage/GoogleLoginPage";
+import HistoryPage from "./components/HistoryPage/HistoryPage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/register" Component={RegisterForm} />
         <Route path="/login" Component={LoginForm} />
         <Route path="/google/login" Component={GoogleLoginPage} />
+        <Route path="/history" Component={HistoryPage} />
       </Routes>
     </div>
   );

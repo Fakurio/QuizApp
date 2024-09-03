@@ -1,0 +1,17 @@
+.mobile-table {
+  background-color: var(--secondary-color);
+  border-radius: 0.5rem;
+  border-collapse: collapse;
+}
+
+.mobile-table__cell {
+  padding: 1rem;
+}
+
+.mobile-table__row {
+  text-align: center;
+}
+
+.mobile-table__row--last {
+  border-bottom: 1px solid var(--accent-color);
+}

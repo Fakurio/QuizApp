@@ -1,0 +1,24 @@
+.table {
+  background-color: var(--secondary-color);
+  border-radius: 0.5rem;
+  border-collapse: collapse;
+}
+
+.table__heading {
+  font-size: 1.5rem;
+  border-bottom: 1px solid var(--accent-color);
+  padding: 1rem;
+}
+
+.table__row {
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.table__row--last {
+  border-bottom: 1px solid var(--accent-color);
+}
+
+.table__cell {
+  padding: 1rem;
+}

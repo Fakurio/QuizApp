@@ -18,6 +18,10 @@
   gap: 30px;
 }
 
+.sidepanel__container a {
+  width: 100%;
+}
+
 @media screen and (max-width: 800px) {
   .sidepanel {
     max-width: 100%;
@@ -27,8 +31,7 @@
     flex-direction: row;
   }
 
-  .sidepanel button {
-    width: auto;
+  .sidepanel__container a {
     flex: 1;
   }
 }

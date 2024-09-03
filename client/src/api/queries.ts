@@ -17,3 +17,16 @@ export const CATEGORY_QUERY = gql`
     }
   }
 `;
+
+export const USER_GAME_HISTORY_QUERY = gql`
+  query getUserGamesHistory {
+    getUserGamesHistory {
+      id
+      categoryName
+      questions {
+        questionName
+        isCorrectlyAnswered
+      }
+    }
+  }
+`;

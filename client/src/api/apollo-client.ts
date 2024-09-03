@@ -12,7 +12,8 @@ const createApolloClient = async (token: string | undefined) => {
   const authLink = setContext((operation, { headers }) => {
     if (
       operation.operationName === "createSoloGame" ||
-      operation.operationName === "sendGameSummary"
+      operation.operationName === "sendGameSummary" ||
+      operation.operationName === "getUserGamesHistory"
     ) {
       return {
         headers: {
