@@ -41,7 +41,37 @@ export class UsersService {
     return await this.usersRepository.update(userID, { refreshToken });
   }
 
-  async getUserGamesHistory(user: User) {
+  async getUserGamesHistory(
+    user: User,
+    offset: number | undefined,
+    limit: number | undefined,
+  ): Promise<{ rawResult: any; totalCount: number }> {
+    const finalOffset = offset || 0;
+    const finalLimit = limit || 3;
+    console.log(finalOffset, finalLimit);
+
+    const totalCount = await this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoin('user.gamesAsPlayerOne', 'soloGames')
+      .select('COUNT(soloGames.id) as count')
+      .where('user.id = :id', { id: user.id })
+      .andWhere('soloGames.isFinished = :isFinished', { isFinished: true })
+      .getRawOne();
+    const gameIDs = await this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoin('user.gamesAsPlayerOne', 'soloGames')
+      .select('soloGames.id as id')
+      .where('user.id = :id', { id: user.id })
+      .andWhere('soloGames.isFinished = :isFinished', { isFinished: true })
+      .orderBy('soloGames.id', 'DESC')
+      .offset(finalOffset)
+      .limit(finalLimit)
+      .getRawMany();
+
+    if (gameIDs.length === 0) {
+      return { rawResult: [], totalCount: 0 };
+    }
+
     const soloGames = await this.usersRepository
       .createQueryBuilder('user')
       .leftJoin('user.gamesAsPlayerOne', 'soloGames')
@@ -54,9 +84,12 @@ export class UsersService {
         'soloGameQuestion.name as questionName',
         'soloGamePlayerAnswers.isCorrect as isCorrectlyAnswered',
       ])
-      .where('user.id = :id', { id: user.id })
-      .andWhere('soloGames.isFinished = :isFinished', { isFinished: true })
+      .where('soloGames.id IN (:...ids)', {
+        ids: gameIDs.map((game) => game.id),
+      })
+      .orderBy('soloGames.id', 'DESC')
       .getRawMany();
+
     // const multiplayerGames = await this.usersRepository
     //   .createQueryBuilder('user')
     //   .leftJoin('user.gamesAsPlayerTwo', 'multiGames')
@@ -76,6 +109,6 @@ export class UsersService {
     //   .getRawMany();
 
     // console.log(multiplayerGames);
-    return soloGames;
+    return { rawResult: soloGames, totalCount: totalCount.count };
   }
 }

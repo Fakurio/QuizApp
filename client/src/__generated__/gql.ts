@@ -20,7 +20,7 @@ const documents = {
     "\n  mutation sendGameSummary(\n    $gameCode: String!\n    $playerAnswers: [PlayerAnswers!]!\n    $playerScore: Int!\n  ) {\n    sendGameSummary(\n      gameCode: $gameCode\n      playerAnswers: $playerAnswers\n      playerScore: $playerScore\n    )\n  }\n": types.SendGameSummaryDocument,
     "\n  query GetDifficulties {\n    difficulties {\n      id\n      name\n    }\n  }\n": types.GetDifficultiesDocument,
     "\n  query GetCategories {\n    categories {\n      id\n      name\n      logo\n    }\n  }\n": types.GetCategoriesDocument,
-    "\n  query GetUserGamesHistory {\n    getUserGamesHistory {\n      id\n      categoryName\n      questions {\n        questionName\n        isCorrectlyAnswered\n      }\n    }\n  }\n": types.GetUserGamesHistoryDocument,
+    "\n  query getUserGamesHistory($offset: Int, $limit: Int) {\n    getUserGamesHistory(offset: $offset, limit: $limit) {\n      totalCount\n      history {\n        id\n        categoryName\n        questions {\n          questionName\n          isCorrectlyAnswered\n        }\n      }\n    }\n  }\n": types.GetUserGamesHistoryDocument,
     "\n  subscription OnNewQuestion($gameCode: String!) {\n    newQuestion(gameCode: $gameCode) {\n      id\n      name\n      answer {\n        correct\n        incorrect\n      }\n      startTime\n      duration\n      latency\n      questionAmount\n    }\n  }\n": types.OnNewQuestionDocument,
 };
 
@@ -69,7 +69,7 @@ export function gql(source: "\n  query GetCategories {\n    categories {\n      
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GetUserGamesHistory {\n    getUserGamesHistory {\n      id\n      categoryName\n      questions {\n        questionName\n        isCorrectlyAnswered\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetUserGamesHistory {\n    getUserGamesHistory {\n      id\n      categoryName\n      questions {\n        questionName\n        isCorrectlyAnswered\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query getUserGamesHistory($offset: Int, $limit: Int) {\n    getUserGamesHistory(offset: $offset, limit: $limit) {\n      totalCount\n      history {\n        id\n        categoryName\n        questions {\n          questionName\n          isCorrectlyAnswered\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query getUserGamesHistory($offset: Int, $limit: Int) {\n    getUserGamesHistory(offset: $offset, limit: $limit) {\n      totalCount\n      history {\n        id\n        categoryName\n        questions {\n          questionName\n          isCorrectlyAnswered\n        }\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

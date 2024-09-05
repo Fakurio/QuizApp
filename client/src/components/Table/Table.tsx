@@ -1,21 +1,23 @@
-import { History } from "../../__generated__/graphql";
+import { HistoryInput } from "../../__generated__/graphql";
 import { sanitizeString } from "../../utils/sanitize-string";
 import "./Table.css";
 
 export interface TableProps {
   columns: string[];
-  items: History[];
+  items: HistoryInput[];
 }
 
 const Table = ({ columns, items }: TableProps) => {
   return (
     <table className="table">
       <thead>
-        {columns.map((col, index) => (
-          <th key={index} className="table__heading">
-            {col}
-          </th>
-        ))}
+        <tr>
+          {columns.map((col, index) => (
+            <th key={index} className="table__heading">
+              {col}
+            </th>
+          ))}
+        </tr>
       </thead>
       <tbody>
         {items.map((item) =>

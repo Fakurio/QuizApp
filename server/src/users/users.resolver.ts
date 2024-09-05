@@ -1,4 +1,4 @@
-import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
@@ -11,8 +11,13 @@ export class UsersResolver {
 
   @UseGuards(GqlAuthGuard)
   @Query('getUserGamesHistory')
-  async getUserGamesHistory(@CurrentUser() user: User) {
-    const rawResult = await this.usersService.getUserGamesHistory(user);
+  async getUserGamesHistory(
+    @CurrentUser() user: User,
+    @Args('offset') offset: number | undefined,
+    @Args('limit') limit: number | undefined,
+  ) {
+    const { rawResult, totalCount } =
+      await this.usersService.getUserGamesHistory(user, offset, limit);
     const history = rawResult.reduce((acc, row) => {
       const { id, categoryName, questionName, isCorrectlyAnswered } = row;
       let game = acc.find((item) => item.id === id);
@@ -24,6 +29,6 @@ export class UsersResolver {
       }
       return acc;
     }, []);
-    return history;
+    return { history, totalCount };
   }
 }

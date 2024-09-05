@@ -1,5 +1,4 @@
 import Table from "../Table/Table";
-import Sidepanel from "../Sidepanel/Sidepanel";
 import { InfoBox } from "../InfoBox/InfoBox";
 import { useQuery } from "@apollo/client";
 import "./HistoryPage.css";
@@ -11,16 +10,18 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 import { useEffect, useState } from "react";
 import MobileTable from "../MobileTable/MobileTable";
+import Button from "../Button/Button";
 
 const columns = ["Category", "Questions", "Correctly Answered"];
 
 const HistoryPage = () => {
   const { user } = useAuth();
-  const { data, loading, error } = useQuery<
+  const { data, loading, error, fetchMore } = useQuery<
     GetUserGamesHistoryQuery,
     GetUserGamesHistoryQueryVariables
   >(USER_GAME_HISTORY_QUERY, { skip: !user });
   const [showMobile, setShowMobile] = useState(false);
+  const [isHistoryEnd, setIsHistoryEnd] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -34,6 +35,20 @@ const HistoryPage = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    if (
+      data &&
+      data.getUserGamesHistory.history.length ===
+        data.getUserGamesHistory.totalCount
+    ) {
+      setIsHistoryEnd(true);
+    }
+  }, [data]);
+
+  const refreshHistory = () => {
+    window.location.reload();
+  };
 
   if (!user) {
     return (
@@ -65,16 +80,37 @@ const HistoryPage = () => {
   }
   return (
     <div className="history-page">
-      {data && data.getUserGamesHistory.length > 0 ? (
+      <Button
+        text="Refresh history"
+        onClick={() => refreshHistory()}
+        className="history-page__button"
+      />
+      {data && data.getUserGamesHistory.history.length > 0 ? (
         <>
           {showMobile ? (
-            <MobileTable columns={columns} items={data.getUserGamesHistory} />
+            <MobileTable
+              columns={columns}
+              items={data.getUserGamesHistory.history}
+            />
           ) : (
-            <Table columns={columns} items={data.getUserGamesHistory} />
+            <Table columns={columns} items={data.getUserGamesHistory.history} />
           )}
         </>
       ) : (
         <InfoBox type="info" text="No history found" />
+      )}
+      {data && !isHistoryEnd && (
+        <Button
+          className="history-page__button history-page__button--load-more"
+          text="Load more"
+          onClick={() =>
+            fetchMore({
+              variables: {
+                offset: data.getUserGamesHistory.history.length,
+              },
+            })
+          }
+        />
       )}
     </div>
   );

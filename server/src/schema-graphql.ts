@@ -41,7 +41,7 @@ export abstract class IQuery {
 
     abstract difficulties(): Difficulty[] | Promise<Difficulty[]>;
 
-    abstract getUserGamesHistory(): History[] | Promise<History[]>;
+    abstract getUserGamesHistory(offset?: Nullable<number>, limit?: Nullable<number>): History | Promise<History>;
 }
 
 export class Answer {
@@ -83,10 +83,15 @@ export class HistoryQuestion {
     isCorrectlyAnswered: boolean;
 }
 
-export class History {
+export class HistoryInput {
     id: number;
     categoryName: string;
     questions: HistoryQuestion[];
+}
+
+export class History {
+    totalCount: number;
+    history: HistoryInput[];
 }
 
 type Nullable<T> = T | null;

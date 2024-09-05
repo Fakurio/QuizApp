@@ -2,6 +2,7 @@
   background-color: var(--secondary-color);
   border-radius: 0.5rem;
   border-collapse: collapse;
+  margin-top: 1.2rem;
 }
 
 .mobile-table__cell {

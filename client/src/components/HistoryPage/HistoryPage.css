@@ -1,4 +1,19 @@
 .history-page {
   display: flex;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding-bottom: 1.2rem;
+}
+
+.history-page__button {
+  width: auto;
+  align-self: flex-start;
+  margin-top: 1.2rem;
+}
+
+.history-page__button--load-more {
+  align-self: center;
+  width: 200px;
+  padding: 1rem;
 }

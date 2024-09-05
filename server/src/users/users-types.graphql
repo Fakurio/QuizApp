@@ -3,12 +3,17 @@ type HistoryQuestion {
   isCorrectlyAnswered: Boolean!
 }
 
-type History {
+type HistoryInput {
   id: Int!
   categoryName: String!
   questions: [HistoryQuestion!]!
 }
 
+type History {
+  totalCount: Int!
+  history: [HistoryInput!]!
+}
+
 type Query {
-  getUserGamesHistory: [History!]!
+  getUserGamesHistory(offset: Int, limit: Int): History!
 }

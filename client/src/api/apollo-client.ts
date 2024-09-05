@@ -50,7 +50,23 @@ const createApolloClient = async (token: string | undefined) => {
 
   return new ApolloClient({
     link: splitLink,
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      typePolicies: {
+        Query: {
+          fields: {
+            getUserGamesHistory: {
+              keyArgs: false,
+              merge(existing = {}, incoming) {
+                return {
+                  ...incoming,
+                  history: [...(existing.history || []), ...incoming.history],
+                };
+              },
+            },
+          },
+        },
+      },
+    }),
   });
 };
 
