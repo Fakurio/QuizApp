@@ -25,6 +25,11 @@ export class PlayerAnswers {
     isCorrect: boolean;
 }
 
+export class SeekGameInput {
+    categoryName: string;
+    difficultyName: string;
+}
+
 export class Category {
     id: number;
     name: string;
@@ -66,6 +71,10 @@ export abstract class IMutation {
     abstract createSoloGame(gameData: GameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
 
     abstract createMutliplayerGame(gameData: GameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
+
+    abstract seekGame(seekGameInput: SeekGameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
+
+    abstract cancelSeekingGame(seekGameInput: SeekGameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
 
     abstract sendGameSummary(gameCode: string, playerAnswers: PlayerAnswers[], playerScore: number): Nullable<boolean> | Promise<Nullable<boolean>>;
 

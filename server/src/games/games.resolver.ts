@@ -7,6 +7,7 @@ import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 import { PlayerAnswers } from 'src/schema-graphql';
+import { SeekGameDTO } from './dto/seek-game.dto';
 
 @Resolver('Game')
 export class GamesResolver {
@@ -54,6 +55,24 @@ export class GamesResolver {
       playerAnswers,
       playerScore,
     );
+  }
+
+  @UseGuards(GqlAuthGuard)
+  @Mutation('seekGame')
+  async seekGame(
+    @CurrentUser() user: User,
+    @Args('seekGameInput') seekGameInput: SeekGameDTO,
+  ) {
+    return this.gamesService.seekGame(user, seekGameInput);
+  }
+
+  @UseGuards(GqlAuthGuard)
+  @Mutation('cancelSeekingGame')
+  async cancelSeekingGame(
+    @CurrentUser() user: User,
+    @Args('seekGameInput') seekGameInput: SeekGameDTO,
+  ) {
+    return this.gamesService.cancelSeekingGame(user, seekGameInput);
   }
 
   @Subscription('newQuestion', {

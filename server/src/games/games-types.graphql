@@ -31,10 +31,17 @@ input PlayerAnswers {
   isCorrect: Boolean!
 }
 
+input SeekGameInput {
+  categoryName: String!
+  difficultyName: String!
+}
+
 type Mutation {
   createGame(gameData: GameInput!): Boolean
   createSoloGame(gameData: GameInput!): Boolean
   createMutliplayerGame(gameData: GameInput!): Boolean
+  seekGame(seekGameInput: SeekGameInput!): Boolean
+  cancelSeekingGame(seekGameInput: SeekGameInput!): Boolean
   sendGameSummary(
     gameCode: String!
     playerAnswers: [PlayerAnswers!]!

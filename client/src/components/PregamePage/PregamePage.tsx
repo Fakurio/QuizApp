@@ -20,6 +20,7 @@ import {
 import toFirstLetterUppercase from "../../utils/first-letter-uppercase";
 import { STOP_GAME_MUTATION } from "../../api/mutations";
 import { DIFFICULTY_QUERY } from "../../api/queries";
+import { useAuth } from "../../contexts/AuthContext";
 
 const PregamePage = () => {
   const { data, loading, error } =
@@ -37,6 +38,8 @@ const PregamePage = () => {
     gameMode: GameMode.Solo,
   });
   const [isFormValid, setIsFormValid] = useState(true);
+  const [showWaitingScreen, setShowWaitingScreen] = useState(false);
+  const { user } = useAuth();
 
   const onGameModeChange = (gameMode: GameMode) => {
     setGameData((prev) => ({ ...prev, gameMode }));
@@ -51,6 +54,10 @@ const PregamePage = () => {
     e.preventDefault();
     if (!gameData.difficultyName) {
       setIsFormValid(false);
+      return;
+    }
+    if (gameData.gameMode === GameMode.Multiplayer) {
+      setShowWaitingScreen(true);
       return;
     }
     navigate("/game", { state: { gameData } });
@@ -79,6 +86,15 @@ const PregamePage = () => {
   if (location.state === null) {
     return <Navigate to="/" />;
   }
+
+  if (showWaitingScreen) {
+    return (
+      <div className="pregame-container">
+        <InfoBox type="info" text="Waiting for opponent..." />
+      </div>
+    );
+  }
+
   return (
     <div className="pregame-container">
       <form className="pregame-form" onSubmit={(e) => startGame(e)}>
@@ -93,15 +109,17 @@ const PregamePage = () => {
                 : undefined
             }`}
           />
-          <Button
-            text="Multiplayer"
-            onClick={() => onGameModeChange(GameMode.Multiplayer)}
-            className={`${
-              gameData.gameMode === GameMode.Multiplayer
-                ? "pregame-form__section__button--active"
-                : undefined
-            }`}
-          />
+          {user && (
+            <Button
+              text="Multiplayer"
+              onClick={() => onGameModeChange(GameMode.Multiplayer)}
+              className={`${
+                gameData.gameMode === GameMode.Multiplayer
+                  ? "pregame-form__section__button--active"
+                  : undefined
+              }`}
+            />
+          )}
         </fieldset>
         <h1 className="pregame-form__heading">Select difficulty</h1>
         <fieldset className="pregame-form__section">

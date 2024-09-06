@@ -10,12 +10,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from 'src/entities/game.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/entities/user.entity';
-import { GameMode, PlayerAnswers } from 'src/schema-graphql';
+import { GameMode, PlayerAnswers, SeekGameInput } from 'src/schema-graphql';
 import { PlayerAnswers as PlayerAnswersEntity } from 'src/entities/player-answers.entity';
+import { SeekGame } from 'src/interfaces/seek-game-interface';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class GamesService {
   private activeGames: Map<string, ActiveGame>;
+  private seekGames: Map<string, SeekGame>;
   constructor(
     private categoryService: CategoriesService,
     private configService: ConfigService,
@@ -30,7 +33,10 @@ export class GamesService {
     private playerAnswersRepository: Repository<PlayerAnswersEntity>,
   ) {
     this.activeGames = new Map();
+    this.seekGames = new Map();
+    this.populateSeekGamesMap();
   }
+
   async createGame(gameData: CreateGameDTO, user: User | null) {
     const questions = await this.categoryService.getQuestionsForCategory(
       gameData.categoryName,
@@ -58,6 +64,7 @@ export class GamesService {
         gameData.categoryName,
       );
     } else {
+      console.log('Gra multi', gameData);
       // this.openMultiplayerGame(gameData.gameCode, randomQuestions, user);
     }
   }
@@ -104,6 +111,36 @@ export class GamesService {
       );
       await this.playerAnswersRepository.save(answer);
     }
+  }
+
+  async seekGame(user: User, seekGameInput: SeekGameInput) {
+    const { categoryName, difficultyName } = seekGameInput;
+    let playersIDs: number[];
+    try {
+      playersIDs = this.seekGames.get(categoryName)[difficultyName];
+    } catch (e) {
+      throw new BadRequestException('Category not found');
+    }
+    if (playersIDs.length >= 1) {
+      const gameData = new CreateGameDTO();
+      gameData.categoryName = categoryName;
+      gameData.difficultyName = difficultyName;
+      gameData.gameMode = GameMode.Multiplayer;
+      gameData.playerOneID = playersIDs.shift();
+      gameData.playerTwoID = user.id;
+      gameData.gameCode = uuidv4();
+      this.createGame(gameData, user);
+    } else {
+      playersIDs.push(user.id);
+    }
+    console.log(this.seekGames);
+  }
+
+  async cancelSeekingGame(user: User, seekGameInput: SeekGameInput) {
+    const { categoryName, difficultyName } = seekGameInput;
+    const playersIDs = this.seekGames.get(categoryName)[difficultyName];
+    playersIDs.splice(playersIDs.indexOf(user.id), 1);
+    console.log(this.seekGames);
   }
 
   private async openSoloGame(
@@ -194,5 +231,16 @@ export class GamesService {
       questions[i] = temp;
     }
     return questions.slice(0, limit);
+  }
+
+  private async populateSeekGamesMap() {
+    const categories = await this.categoryService.getCategories();
+    const difficulties = await this.categoryService.getDifficulties();
+    for (const category of categories) {
+      for (const diff of difficulties) {
+        const prev = this.seekGames.get(category.name);
+        this.seekGames.set(category.name, { ...prev, [diff.name]: [] });
+      }
+    }
   }
 }
