@@ -4,17 +4,21 @@ import { createClient } from "graphql-ws";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { setContext } from "@apollo/client/link/context";
 
+const protectedOperations = [
+  "createSoloGame",
+  "sendGameSummary",
+  "getUserGamesHistory",
+  "seekGame",
+  "cancelSeekingGame",
+];
+
 const createApolloClient = async (token: string | undefined) => {
   const httpLink = new HttpLink({
     uri: `${import.meta.env.VITE_HTML_URL}/graphql`,
   });
 
   const authLink = setContext((operation, { headers }) => {
-    if (
-      operation.operationName === "createSoloGame" ||
-      operation.operationName === "sendGameSummary" ||
-      operation.operationName === "getUserGamesHistory"
-    ) {
+    if (protectedOperations.includes(operation.operationName || "")) {
       return {
         headers: {
           ...headers,

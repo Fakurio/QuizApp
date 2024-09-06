@@ -83,4 +83,16 @@ export class GamesResolver {
   sendNewQuestion() {
     return this.pubSub.asyncIterator('newQuestion');
   }
+
+  @Subscription('opponentFound', {
+    filter: (payload, variables) => {
+      return (
+        payload.opponentFound.playerOneID === variables.playerID ||
+        payload.opponentFound.playerTwoID === variables.playerID
+      );
+    },
+  })
+  sendGamecodeToPlayers() {
+    return this.pubSub.asyncIterator('opponentFound');
+  }
 }

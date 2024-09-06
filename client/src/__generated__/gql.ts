@@ -18,10 +18,13 @@ const documents = {
     "\n  mutation endRound($gameCode: String!) {\n    endRound(gameCode: $gameCode)\n  }\n": types.EndRoundDocument,
     "\n  mutation createSoloGame($gameData: GameInput!) {\n    createSoloGame(gameData: $gameData)\n  }\n": types.CreateSoloGameDocument,
     "\n  mutation sendGameSummary(\n    $gameCode: String!\n    $playerAnswers: [PlayerAnswers!]!\n    $playerScore: Int!\n  ) {\n    sendGameSummary(\n      gameCode: $gameCode\n      playerAnswers: $playerAnswers\n      playerScore: $playerScore\n    )\n  }\n": types.SendGameSummaryDocument,
+    "\n  mutation seekGame($seekGameInput: SeekGameInput!) {\n    seekGame(seekGameInput: $seekGameInput)\n  }\n": types.SeekGameDocument,
+    "\n  mutation cancelSeekingGame($seekGameInput: SeekGameInput!) {\n    cancelSeekingGame(seekGameInput: $seekGameInput)\n  }\n": types.CancelSeekingGameDocument,
     "\n  query GetDifficulties {\n    difficulties {\n      id\n      name\n    }\n  }\n": types.GetDifficultiesDocument,
     "\n  query GetCategories {\n    categories {\n      id\n      name\n      logo\n    }\n  }\n": types.GetCategoriesDocument,
     "\n  query getUserGamesHistory($offset: Int, $limit: Int) {\n    getUserGamesHistory(offset: $offset, limit: $limit) {\n      totalCount\n      history {\n        id\n        categoryName\n        questions {\n          questionName\n          isCorrectlyAnswered\n        }\n      }\n    }\n  }\n": types.GetUserGamesHistoryDocument,
     "\n  subscription OnNewQuestion($gameCode: String!) {\n    newQuestion(gameCode: $gameCode) {\n      id\n      name\n      answer {\n        correct\n        incorrect\n      }\n      startTime\n      duration\n      latency\n      questionAmount\n    }\n  }\n": types.OnNewQuestionDocument,
+    "\n  subscription OnOpponentFound($playerID: Int!) {\n    opponentFound(playerID: $playerID) {\n      gameCode\n    }\n  }\n": types.OnOpponentFoundDocument,
 };
 
 /**
@@ -61,6 +64,14 @@ export function gql(source: "\n  mutation sendGameSummary(\n    $gameCode: Strin
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  mutation seekGame($seekGameInput: SeekGameInput!) {\n    seekGame(seekGameInput: $seekGameInput)\n  }\n"): (typeof documents)["\n  mutation seekGame($seekGameInput: SeekGameInput!) {\n    seekGame(seekGameInput: $seekGameInput)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation cancelSeekingGame($seekGameInput: SeekGameInput!) {\n    cancelSeekingGame(seekGameInput: $seekGameInput)\n  }\n"): (typeof documents)["\n  mutation cancelSeekingGame($seekGameInput: SeekGameInput!) {\n    cancelSeekingGame(seekGameInput: $seekGameInput)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query GetDifficulties {\n    difficulties {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query GetDifficulties {\n    difficulties {\n      id\n      name\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -74,6 +85,10 @@ export function gql(source: "\n  query getUserGamesHistory($offset: Int, $limit:
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  subscription OnNewQuestion($gameCode: String!) {\n    newQuestion(gameCode: $gameCode) {\n      id\n      name\n      answer {\n        correct\n        incorrect\n      }\n      startTime\n      duration\n      latency\n      questionAmount\n    }\n  }\n"): (typeof documents)["\n  subscription OnNewQuestion($gameCode: String!) {\n    newQuestion(gameCode: $gameCode) {\n      id\n      name\n      answer {\n        correct\n        incorrect\n      }\n      startTime\n      duration\n      latency\n      questionAmount\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  subscription OnOpponentFound($playerID: Int!) {\n    opponentFound(playerID: $playerID) {\n      gameCode\n    }\n  }\n"): (typeof documents)["\n  subscription OnOpponentFound($playerID: Int!) {\n    opponentFound(playerID: $playerID) {\n      gameCode\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

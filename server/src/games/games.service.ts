@@ -64,8 +64,7 @@ export class GamesService {
         gameData.categoryName,
       );
     } else {
-      console.log('Gra multi', gameData);
-      // this.openMultiplayerGame(gameData.gameCode, randomQuestions, user);
+      this.openMultiplayerGame(gameData, randomQuestions);
     }
   }
 
@@ -156,6 +155,21 @@ export class GamesService {
     game.category = await this.categoryService.getCategoryByName(categoryName);
     await this.gameRepository.save(game);
     this.startGame(gameCode, questions);
+  }
+
+  private async openMultiplayerGame(
+    gameData: CreateGameDTO,
+    questions: Question[],
+  ) {
+    //send subscription to both player that opponent is found
+    this.pubSub.publish('opponentFound', {
+      opponentFound: {
+        gameCode: gameData.gameCode,
+        playerOneID: gameData.playerOneID,
+        playerTwoID: gameData.playerTwoID,
+      },
+    });
+    //create game in db
   }
 
   private startGame(gameCode: string, questions: Question[]) {

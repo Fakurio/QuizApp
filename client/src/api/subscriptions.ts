@@ -15,3 +15,11 @@ export const ON_NEW_QUESTION = gql`
     }
   }
 `;
+
+export const ON_OPPONENT_FOUND = gql`
+  subscription OnOpponentFound($playerID: Int!) {
+    opponentFound(playerID: $playerID) {
+      gameCode
+    }
+  }
+`;

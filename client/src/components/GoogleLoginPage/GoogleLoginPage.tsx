@@ -9,11 +9,13 @@ const GoogleLoginPage = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
+    const id = params.get("id");
     const username = params.get("username");
     const accessToken = params.get("accessToken");
     const avatarUrl = params.get("avatarUrl");
     if (username && accessToken && avatarUrl) {
       setUser({
+        id: parseInt(id!),
         username,
         avatarUrl: avatarUrl,
         accessToken,

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 interface User {
+  id: number;
   username: string;
   avatarUrl: string | null;
   accessToken: string;
@@ -53,6 +54,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const params = new URLSearchParams(location.search);
     if (
       !(
+        params.get("id") &&
         params.get("username") &&
         params.get("accessToken") &&
         params.get("avatarUrl")

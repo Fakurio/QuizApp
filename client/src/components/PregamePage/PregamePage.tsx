@@ -1,6 +1,6 @@
 import Button from "../Button/Button";
 import "./PregamePage.css";
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation, useSubscription } from "@apollo/client";
 import {
   useLocation,
   useNavigate,
@@ -11,23 +11,58 @@ import { FormEvent, useEffect, useState } from "react";
 import { InfoBox } from "../InfoBox/InfoBox";
 import { v4 as uuidv4 } from "uuid";
 import {
+  CancelSeekingGameMutation,
+  CancelSeekingGameMutationVariables,
   GameInput,
   GameMode,
   GetDifficultiesQuery,
+  OnOpponentFoundSubscription,
+  OnOpponentFoundSubscriptionVariables,
+  SeekGameMutation,
+  SeekGameMutationVariables,
   StopGameMutation,
   StopGameMutationVariables,
 } from "../../__generated__/graphql";
 import toFirstLetterUppercase from "../../utils/first-letter-uppercase";
-import { STOP_GAME_MUTATION } from "../../api/mutations";
+import {
+  CANCEL_SEEKING_GAME_MUTATION,
+  SEEK_GAME_MUTATION,
+  STOP_GAME_MUTATION,
+} from "../../api/mutations";
 import { DIFFICULTY_QUERY } from "../../api/queries";
 import { useAuth } from "../../contexts/AuthContext";
+import { ON_OPPONENT_FOUND } from "../../api/subscriptions";
 
 const PregamePage = () => {
+  const { user } = useAuth();
   const { data, loading, error } =
     useQuery<GetDifficultiesQuery>(DIFFICULTY_QUERY);
   const [stopGame] = useMutation<StopGameMutation, StopGameMutationVariables>(
     STOP_GAME_MUTATION
   );
+  const [seekGame] = useMutation<SeekGameMutation, SeekGameMutationVariables>(
+    SEEK_GAME_MUTATION
+  );
+  const [cancelSeekingGame] = useMutation<
+    CancelSeekingGameMutation,
+    CancelSeekingGameMutationVariables
+  >(CANCEL_SEEKING_GAME_MUTATION);
+  // const { data, loading, error } = useSubscription<
+  //   OnNewQuestionSubscription,
+  //   OnNewQuestionSubscriptionVariables
+  // >(ON_NEW_QUESTION, {
+  //   variables: {
+  //     gameCode: location.state?.gameData.gameCode || "",
+  //   },
+  // });
+  const { data: onOpponentFoundData } = useSubscription<
+    OnOpponentFoundSubscription,
+    OnOpponentFoundSubscriptionVariables
+  >(ON_OPPONENT_FOUND, {
+    variables: {
+      playerID: user!.id,
+    },
+  });
   const location = useLocation();
   const navigate = useNavigate();
   const navigationType = useNavigationType();
@@ -39,7 +74,6 @@ const PregamePage = () => {
   });
   const [isFormValid, setIsFormValid] = useState(true);
   const [showWaitingScreen, setShowWaitingScreen] = useState(false);
-  const { user } = useAuth();
 
   const onGameModeChange = (gameMode: GameMode) => {
     setGameData((prev) => ({ ...prev, gameMode }));
@@ -57,10 +91,30 @@ const PregamePage = () => {
       return;
     }
     if (gameData.gameMode === GameMode.Multiplayer) {
+      seekGame({
+        variables: {
+          seekGameInput: {
+            categoryName: gameData.categoryName,
+            difficultyName: gameData.difficultyName,
+          },
+        },
+      });
       setShowWaitingScreen(true);
       return;
     }
     navigate("/game", { state: { gameData } });
+  };
+
+  const onCancelSeekingGame = () => {
+    cancelSeekingGame({
+      variables: {
+        seekGameInput: {
+          categoryName: gameData.categoryName,
+          difficultyName: gameData.difficultyName,
+        },
+      },
+    });
+    setShowWaitingScreen(false);
   };
 
   useEffect(() => {
@@ -91,6 +145,16 @@ const PregamePage = () => {
     return (
       <div className="pregame-container">
         <InfoBox type="info" text="Waiting for opponent..." />
+        <Button
+          text="Cancel"
+          onClick={onCancelSeekingGame}
+          className="pregame-container__button"
+        />
+        {onOpponentFoundData && (
+          <div>
+            <p>{onOpponentFoundData.opponentFound.gameCode}</p>
+          </div>
+        )}
       </div>
     );
   }

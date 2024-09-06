@@ -81,8 +81,10 @@ export class AuthService {
     const { accessToken, refreshToken } = await this.generateTokens(user);
     response.cookie('refresh_token', refreshToken, { httpOnly: true });
     return {
+      id: user.id,
       username: user.username,
       accessToken,
+      avatarUrl: user.avatarUrl,
     };
   }
 
@@ -90,6 +92,7 @@ export class AuthService {
     const { accessToken, refreshToken } = await this.generateTokens(user);
     response.cookie('refresh_token', refreshToken, { httpOnly: true });
     return {
+      id: user.id,
       username: user.username,
       accessToken,
       avatarUrl: user.avatarUrl,
@@ -108,7 +111,7 @@ export class AuthService {
     const { accessToken, refreshToken } = await this.generateTokens(user);
     response.cookie('refresh_token', refreshToken, { httpOnly: true });
     response.redirect(
-      `http://localhost:5173/google/login?username=${user.username}&accessToken=${accessToken}&avatarUrl=${user.avatarUrl}`,
+      `http://localhost:5173/google/login?id=${user.id}username=${user.username}&accessToken=${accessToken}&avatarUrl=${user.avatarUrl}`,
     );
   }
 

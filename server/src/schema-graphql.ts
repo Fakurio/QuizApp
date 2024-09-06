@@ -65,6 +65,12 @@ export class Question {
     questionAmount?: Nullable<number>;
 }
 
+export class OpponentFound {
+    playerOneID: number;
+    playerTwoID: number;
+    gameCode: string;
+}
+
 export abstract class IMutation {
     abstract createGame(gameData: GameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
 
@@ -85,6 +91,8 @@ export abstract class IMutation {
 
 export abstract class ISubscription {
     abstract newQuestion(gameCode: string): Question | Promise<Question>;
+
+    abstract opponentFound(playerID: number): OpponentFound | Promise<OpponentFound>;
 }
 
 export class HistoryQuestion {

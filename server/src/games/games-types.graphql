@@ -36,6 +36,12 @@ input SeekGameInput {
   difficultyName: String!
 }
 
+type OpponentFound {
+  playerOneID: Int!
+  playerTwoID: Int!
+  gameCode: String!
+}
+
 type Mutation {
   createGame(gameData: GameInput!): Boolean
   createSoloGame(gameData: GameInput!): Boolean
@@ -53,4 +59,5 @@ type Mutation {
 
 type Subscription {
   newQuestion(gameCode: String!): Question!
+  opponentFound(playerID: Int!): OpponentFound!
 }

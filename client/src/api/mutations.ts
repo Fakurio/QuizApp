@@ -36,3 +36,15 @@ export const SEND_GAME_SUMMARY_MUTATION = gql`
     )
   }
 `;
+
+export const SEEK_GAME_MUTATION = gql`
+  mutation seekGame($seekGameInput: SeekGameInput!) {
+    seekGame(seekGameInput: $seekGameInput)
+  }
+`;
+
+export const CANCEL_SEEKING_GAME_MUTATION = gql`
+  mutation cancelSeekingGame($seekGameInput: SeekGameInput!) {
+    cancelSeekingGame(seekGameInput: $seekGameInput)
+  }
+`;

@@ -68,12 +68,19 @@ export type HistoryQuestion = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  cancelSeekingGame?: Maybe<Scalars['Boolean']['output']>;
   createGame?: Maybe<Scalars['Boolean']['output']>;
   createMutliplayerGame?: Maybe<Scalars['Boolean']['output']>;
   createSoloGame?: Maybe<Scalars['Boolean']['output']>;
   endRound?: Maybe<Scalars['Boolean']['output']>;
+  seekGame?: Maybe<Scalars['Boolean']['output']>;
   sendGameSummary?: Maybe<Scalars['Boolean']['output']>;
   stopGame?: Maybe<Scalars['Boolean']['output']>;
+};
+
+
+export type MutationCancelSeekingGameArgs = {
+  seekGameInput: SeekGameInput;
 };
 
 
@@ -97,6 +104,11 @@ export type MutationEndRoundArgs = {
 };
 
 
+export type MutationSeekGameArgs = {
+  seekGameInput: SeekGameInput;
+};
+
+
 export type MutationSendGameSummaryArgs = {
   gameCode: Scalars['String']['input'];
   playerAnswers: Array<PlayerAnswers>;
@@ -106,6 +118,13 @@ export type MutationSendGameSummaryArgs = {
 
 export type MutationStopGameArgs = {
   gameCode: Scalars['String']['input'];
+};
+
+export type OpponentFound = {
+  __typename?: 'OpponentFound';
+  gameCode: Scalars['String']['output'];
+  playerOneID: Scalars['Int']['output'];
+  playerTwoID: Scalars['Int']['output'];
 };
 
 export type PlayerAnswers = {
@@ -138,14 +157,25 @@ export type Question = {
   startTime: Scalars['String']['output'];
 };
 
+export type SeekGameInput = {
+  categoryName: Scalars['String']['input'];
+  difficultyName: Scalars['String']['input'];
+};
+
 export type Subscription = {
   __typename?: 'Subscription';
   newQuestion: Question;
+  opponentFound: OpponentFound;
 };
 
 
 export type SubscriptionNewQuestionArgs = {
   gameCode: Scalars['String']['input'];
+};
+
+
+export type SubscriptionOpponentFoundArgs = {
+  playerID: Scalars['Int']['input'];
 };
 
 export type StopGameMutationVariables = Exact<{
@@ -185,6 +215,20 @@ export type SendGameSummaryMutationVariables = Exact<{
 
 export type SendGameSummaryMutation = { __typename?: 'Mutation', sendGameSummary?: boolean | null };
 
+export type SeekGameMutationVariables = Exact<{
+  seekGameInput: SeekGameInput;
+}>;
+
+
+export type SeekGameMutation = { __typename?: 'Mutation', seekGame?: boolean | null };
+
+export type CancelSeekingGameMutationVariables = Exact<{
+  seekGameInput: SeekGameInput;
+}>;
+
+
+export type CancelSeekingGameMutation = { __typename?: 'Mutation', cancelSeekingGame?: boolean | null };
+
 export type GetDifficultiesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -210,13 +254,23 @@ export type OnNewQuestionSubscriptionVariables = Exact<{
 
 export type OnNewQuestionSubscription = { __typename?: 'Subscription', newQuestion: { __typename?: 'Question', id: number, name: string, startTime: string, duration: number, latency: number, questionAmount?: number | null, answer: { __typename?: 'Answer', correct: string, incorrect: Array<string> } } };
 
+export type OnOpponentFoundSubscriptionVariables = Exact<{
+  playerID: Scalars['Int']['input'];
+}>;
+
+
+export type OnOpponentFoundSubscription = { __typename?: 'Subscription', opponentFound: { __typename?: 'OpponentFound', gameCode: string } };
+
 
 export const StopGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"StopGame"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stopGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameCode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}}}]}]}}]} as unknown as DocumentNode<StopGameMutation, StopGameMutationVariables>;
 export const CreateGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createGame"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameData"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GameInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameData"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameData"}}}]}]}}]} as unknown as DocumentNode<CreateGameMutation, CreateGameMutationVariables>;
 export const EndRoundDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"endRound"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"endRound"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameCode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}}}]}]}}]} as unknown as DocumentNode<EndRoundMutation, EndRoundMutationVariables>;
 export const CreateSoloGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createSoloGame"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameData"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GameInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createSoloGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameData"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameData"}}}]}]}}]} as unknown as DocumentNode<CreateSoloGameMutation, CreateSoloGameMutationVariables>;
 export const SendGameSummaryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"sendGameSummary"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"playerAnswers"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerAnswers"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"playerScore"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sendGameSummary"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameCode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}}},{"kind":"Argument","name":{"kind":"Name","value":"playerAnswers"},"value":{"kind":"Variable","name":{"kind":"Name","value":"playerAnswers"}}},{"kind":"Argument","name":{"kind":"Name","value":"playerScore"},"value":{"kind":"Variable","name":{"kind":"Name","value":"playerScore"}}}]}]}}]} as unknown as DocumentNode<SendGameSummaryMutation, SendGameSummaryMutationVariables>;
+export const SeekGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"seekGame"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"seekGameInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SeekGameInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"seekGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"seekGameInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"seekGameInput"}}}]}]}}]} as unknown as DocumentNode<SeekGameMutation, SeekGameMutationVariables>;
+export const CancelSeekingGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"cancelSeekingGame"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"seekGameInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SeekGameInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cancelSeekingGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"seekGameInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"seekGameInput"}}}]}]}}]} as unknown as DocumentNode<CancelSeekingGameMutation, CancelSeekingGameMutationVariables>;
 export const GetDifficultiesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDifficulties"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"difficulties"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetDifficultiesQuery, GetDifficultiesQueryVariables>;
 export const GetCategoriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCategories"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"categories"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"logo"}}]}}]}}]} as unknown as DocumentNode<GetCategoriesQuery, GetCategoriesQueryVariables>;
 export const GetUserGamesHistoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserGamesHistory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getUserGamesHistory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"history"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"categoryName"}},{"kind":"Field","name":{"kind":"Name","value":"questions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"questionName"}},{"kind":"Field","name":{"kind":"Name","value":"isCorrectlyAnswered"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetUserGamesHistoryQuery, GetUserGamesHistoryQueryVariables>;
 export const OnNewQuestionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"OnNewQuestion"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"newQuestion"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameCode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"answer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"correct"}},{"kind":"Field","name":{"kind":"Name","value":"incorrect"}}]}},{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"latency"}},{"kind":"Field","name":{"kind":"Name","value":"questionAmount"}}]}}]}}]} as unknown as DocumentNode<OnNewQuestionSubscription, OnNewQuestionSubscriptionVariables>;
+export const OnOpponentFoundDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"OnOpponentFound"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"playerID"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"opponentFound"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"playerID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"playerID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gameCode"}}]}}]}}]} as unknown as DocumentNode<OnOpponentFoundSubscription, OnOpponentFoundSubscriptionVariables>;
