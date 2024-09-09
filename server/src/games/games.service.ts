@@ -143,11 +143,22 @@ export class GamesService {
     playerScore: number,
   ) {
     const game = await this.gameRepository.findOne({
+      relations: ['playerOne', 'playerTwo'],
       where: { gameCode },
     });
-    game.playerOneScore = playerScore;
-    game.isFinished = true;
-    await this.gameRepository.save(game);
+    if (game.playerTwo !== null) {
+      if (game.playerOne.id === user.id) {
+        game.playerOneScore = playerScore;
+      } else {
+        game.playerTwoScore = playerScore;
+      }
+      game.isFinished = true;
+      await this.gameRepository.save(game);
+    } else {
+      game.playerOneScore = playerScore;
+      game.isFinished = true;
+      await this.gameRepository.save(game);
+    }
     for (const playerAnswer of playerAnswers) {
       const answer = new PlayerAnswersEntity();
       answer.game = game;

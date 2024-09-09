@@ -18,3 +18,7 @@
 .game-page__round-info__round {
   font-size: 1.2rem;
 }
+
+.game-page__opponent-answer {
+  margin-top: 1.2rem;
+}

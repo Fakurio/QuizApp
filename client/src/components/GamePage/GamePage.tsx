@@ -233,11 +233,15 @@ const GamePage = () => {
             onAnswerSelection={handleAnswerSelection}
           />
           {opponentAnswer && showOpponentAnswer && (
-            <p>
-              {opponentAnswer.opponentAnswer.isCorrect
-                ? "Przeciwnik odpowiedział poprawnie"
-                : "Pzeciwnik spadł z rowerka"}
-            </p>
+            <InfoBox
+              type="info"
+              text={
+                opponentAnswer.opponentAnswer.isCorrect
+                  ? "Opponent answered correctly"
+                  : "Opponent answered incorrectly"
+              }
+              className="game-page__opponent-answer"
+            />
           )}
         </>
       )}
