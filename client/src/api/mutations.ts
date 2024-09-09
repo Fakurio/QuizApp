@@ -12,8 +12,8 @@ export const CREATE_GAME_MUTATION = gql`
 `;
 
 export const END_ROUND_MUTATION = gql`
-  mutation endRound($gameCode: String!) {
-    endRound(gameCode: $gameCode)
+  mutation endRound($gameCode: String!, $currentAnswer: CurrentAnswer) {
+    endRound(gameCode: $gameCode, currentAnswer: $currentAnswer)
   }
 `;
 

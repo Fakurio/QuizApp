@@ -46,8 +46,8 @@ const GameSummary = ({
         }
       }
     };
-
-    sendGameSummaryToServer();
+    console.log("GameSummaryProps", playerPoints, playerAnswers, gameCode);
+    // sendGameSummaryToServer();
   }, []);
 
   return (

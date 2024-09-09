@@ -6,6 +6,7 @@ import { PubSub } from 'graphql-subscriptions';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Game } from 'src/entities/game.entity';
 import { PlayerAnswers } from 'src/entities/player-answers.entity';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   providers: [
@@ -13,6 +14,10 @@ import { PlayerAnswers } from 'src/entities/player-answers.entity';
     GamesService,
     { provide: 'PUB_SUB', useValue: new PubSub() },
   ],
-  imports: [CategoriesModule, TypeOrmModule.forFeature([Game, PlayerAnswers])],
+  imports: [
+    CategoriesModule,
+    TypeOrmModule.forFeature([Game, PlayerAnswers]),
+    UsersModule,
+  ],
 })
 export class GamesModule {}

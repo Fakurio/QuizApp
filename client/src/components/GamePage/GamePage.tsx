@@ -19,6 +19,8 @@ import {
   CreateSoloGameMutationVariables,
   CreateSoloGameMutation,
   PlayerAnswers,
+  OnOpponentAnswerSubscription,
+  OnOpponentAnswerSubscriptionVariables,
 } from "../../__generated__/graphql";
 import QuestionCard from "../QuestionCard/QuestionCard";
 import { useEffect, useState, useRef } from "react";
@@ -31,10 +33,11 @@ import {
   END_ROUND_MUTATION,
   CREATE_SOLO_GAME_MUTATION,
 } from "../../api/mutations";
-import { ON_NEW_QUESTION } from "../../api/subscriptions";
+import { ON_NEW_QUESTION, ON_OPPONENT_ANSWER } from "../../api/subscriptions";
 import { useAuth } from "../../contexts/AuthContext";
 
 const GamePage = () => {
+  const { user, refreshTokens } = useAuth();
   const location = useLocation();
   const [createGame] = useMutation<
     CreateGameMutation,
@@ -56,21 +59,34 @@ const GamePage = () => {
       gameCode: location.state?.gameData.gameCode || "",
     },
   });
+  const { data: opponentAnswer } = useSubscription<
+    OnOpponentAnswerSubscription,
+    OnOpponentAnswerSubscriptionVariables
+  >(ON_OPPONENT_ANSWER, {
+    variables: {
+      gameCode: location.state.gameData.gameCode,
+      playerID: user?.id || 0,
+    },
+  });
   const [stopGame] = useMutation<StopGameMutation, StopGameMutationVariables>(
     STOP_GAME_MUTATION
   );
-  const { user, refreshTokens } = useAuth();
+
   const navigate = useNavigate();
   const navigationType = useNavigationType();
   const [showCorrectAnswer, setShowCorrectAnswer] = useState(false);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
   const [playerAnswers, setPlayerAnswers] = useState<PlayerAnswers[]>([]);
+  const [showOpponentAnswer, setShowOpponentAnswer] = useState(false);
   const playerPoints = useRef(0);
   const questionAmount = useRef(0);
 
   const startGame = async () => {
     const gameData = location.state.gameData;
+    if (gameData.gameMode === GameMode.Multiplayer) {
+      return;
+    }
     try {
       if (!user) {
         await createGame({
@@ -99,19 +115,29 @@ const GamePage = () => {
     }
     setShowCorrectAnswer(true);
 
-    if (location.state.gameData.gameMode === GameMode.Solo) {
-      setPlayerAnswers((prev) => {
-        return [...prev, { questionID, isCorrect }];
-      });
-    }
+    setPlayerAnswers((prev) => {
+      return [...prev, { questionID, isCorrect }];
+    });
 
-    setTimeout(() => {
+    if (location.state.gameData.gameMode === GameMode.Multiplayer) {
       endRound({
         variables: {
           gameCode: location.state.gameData.gameCode,
+          currentAnswer: {
+            playerID: user?.id || 0,
+            isCorrect: isCorrect,
+          },
         },
       });
-    }, (data?.newQuestion.latency || 1) * 1000);
+    } else {
+      setTimeout(() => {
+        endRound({
+          variables: {
+            gameCode: location.state.gameData.gameCode,
+          },
+        });
+      }, (data?.newQuestion.latency || 1) * 1000);
+    }
   };
 
   useEffect(() => {
@@ -132,6 +158,7 @@ const GamePage = () => {
   useEffect(() => {
     if (data?.newQuestion) {
       setQuestionNumber((prev) => prev + 1);
+      setShowOpponentAnswer(false);
     }
     if (data?.newQuestion.questionAmount) {
       questionAmount.current = data.newQuestion.questionAmount;
@@ -145,6 +172,12 @@ const GamePage = () => {
       }, (data?.newQuestion.latency || 1) * 1000);
     }
   }, [questionNumber, showCorrectAnswer, questionAmount]);
+
+  useEffect(() => {
+    if (opponentAnswer?.opponentAnswer) {
+      setShowOpponentAnswer(true);
+    }
+  }, [opponentAnswer]);
 
   if (!location.state) {
     return <Navigate to="/" />;
@@ -199,6 +232,13 @@ const GamePage = () => {
             showCorrectAnswer={showCorrectAnswer}
             onAnswerSelection={handleAnswerSelection}
           />
+          {opponentAnswer && showOpponentAnswer && (
+            <p>
+              {opponentAnswer.opponentAnswer.isCorrect
+                ? "Przeciwnik odpowiedział poprawnie"
+                : "Pzeciwnik spadł z rowerka"}
+            </p>
+          )}
         </>
       )}
     </div>

@@ -42,6 +42,17 @@ type OpponentFound {
   gameCode: String!
 }
 
+input CurrentAnswer {
+  playerID: Int!
+  isCorrect: Boolean!
+}
+
+type OpponentAnswer {
+  gameCode: String!
+  playerID: Int!
+  isCorrect: Boolean!
+}
+
 type Mutation {
   createGame(gameData: GameInput!): Boolean
   createSoloGame(gameData: GameInput!): Boolean
@@ -54,10 +65,11 @@ type Mutation {
     playerScore: Int!
   ): Boolean
   stopGame(gameCode: String!): Boolean
-  endRound(gameCode: String!): Boolean
+  endRound(gameCode: String!, currentAnswer: CurrentAnswer): Boolean
 }
 
 type Subscription {
   newQuestion(gameCode: String!): Question!
   opponentFound(playerID: Int!): OpponentFound!
+  opponentAnswer(gameCode: String!, playerID: Int!): OpponentAnswer!
 }

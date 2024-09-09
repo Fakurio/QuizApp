@@ -34,7 +34,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { ON_OPPONENT_FOUND } from "../../api/subscriptions";
 
 const PregamePage = () => {
-  const { user } = useAuth();
+  const { user, refreshTokens } = useAuth();
   const { data, loading, error } =
     useQuery<GetDifficultiesQuery>(DIFFICULTY_QUERY);
   const [stopGame] = useMutation<StopGameMutation, StopGameMutationVariables>(
@@ -47,20 +47,12 @@ const PregamePage = () => {
     CancelSeekingGameMutation,
     CancelSeekingGameMutationVariables
   >(CANCEL_SEEKING_GAME_MUTATION);
-  // const { data, loading, error } = useSubscription<
-  //   OnNewQuestionSubscription,
-  //   OnNewQuestionSubscriptionVariables
-  // >(ON_NEW_QUESTION, {
-  //   variables: {
-  //     gameCode: location.state?.gameData.gameCode || "",
-  //   },
-  // });
   const { data: onOpponentFoundData } = useSubscription<
     OnOpponentFoundSubscription,
     OnOpponentFoundSubscriptionVariables
   >(ON_OPPONENT_FOUND, {
     variables: {
-      playerID: user!.id,
+      playerID: user?.id || 0,
     },
   });
   const location = useLocation();
@@ -84,24 +76,32 @@ const PregamePage = () => {
     setGameData((prev) => ({ ...prev, difficultyName }));
   };
 
-  const startGame = (e: FormEvent) => {
+  const startGame = async (e: FormEvent) => {
     e.preventDefault();
     if (!gameData.difficultyName) {
       setIsFormValid(false);
       return;
     }
-    if (gameData.gameMode === GameMode.Multiplayer) {
-      seekGame({
-        variables: {
-          seekGameInput: {
-            categoryName: gameData.categoryName,
-            difficultyName: gameData.difficultyName,
+    try {
+      if (gameData.gameMode === GameMode.Multiplayer) {
+        seekGame({
+          variables: {
+            seekGameInput: {
+              categoryName: gameData.categoryName,
+              difficultyName: gameData.difficultyName,
+            },
           },
-        },
-      });
-      setShowWaitingScreen(true);
-      return;
+        });
+        setShowWaitingScreen(true);
+        return;
+      }
+    } catch (error: any) {
+      if (error.message === "Unauthorized") {
+        await refreshTokens();
+        startGame(e);
+      }
     }
+
     navigate("/game", { state: { gameData } });
   };
 
@@ -141,6 +141,19 @@ const PregamePage = () => {
     return <Navigate to="/" />;
   }
 
+  useEffect(() => {
+    if (onOpponentFoundData) {
+      navigate("/game", {
+        state: {
+          gameData: {
+            ...gameData,
+            gameCode: onOpponentFoundData.opponentFound.gameCode,
+          },
+        },
+      });
+    }
+  }, [onOpponentFoundData]);
+
   if (showWaitingScreen) {
     return (
       <div className="pregame-container">
@@ -150,11 +163,6 @@ const PregamePage = () => {
           onClick={onCancelSeekingGame}
           className="pregame-container__button"
         />
-        {onOpponentFoundData && (
-          <div>
-            <p>{onOpponentFoundData.opponentFound.gameCode}</p>
-          </div>
-        )}
       </div>
     );
   }

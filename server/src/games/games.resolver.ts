@@ -6,7 +6,7 @@ import { PubSub } from 'graphql-subscriptions';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
-import { PlayerAnswers } from 'src/schema-graphql';
+import { CurrentAnswer, PlayerAnswers } from 'src/schema-graphql';
 import { SeekGameDTO } from './dto/seek-game.dto';
 
 @Resolver('Game')
@@ -37,8 +37,11 @@ export class GamesResolver {
   }
 
   @Mutation('endRound')
-  async endRound(@Args('gameCode') gameCode: string) {
-    return this.gamesService.endRound(gameCode);
+  async endRound(
+    @Args('gameCode') gameCode: string,
+    @Args('currentAnswer') currentAnswer: CurrentAnswer,
+  ) {
+    return this.gamesService.endRound(gameCode, currentAnswer);
   }
 
   @UseGuards(GqlAuthGuard)
@@ -94,5 +97,17 @@ export class GamesResolver {
   })
   sendGamecodeToPlayers() {
     return this.pubSub.asyncIterator('opponentFound');
+  }
+
+  @Subscription('opponentAnswer', {
+    filter: (payload, variables) => {
+      return (
+        payload.opponentAnswer.gameCode === variables.gameCode &&
+        payload.opponentAnswer.playerID === variables.playerID
+      );
+    },
+  })
+  sendEachOtherAnswers() {
+    return this.pubSub.asyncIterator('opponentAnswer');
   }
 }

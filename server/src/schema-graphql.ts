@@ -30,6 +30,11 @@ export class SeekGameInput {
     difficultyName: string;
 }
 
+export class CurrentAnswer {
+    playerID: number;
+    isCorrect: boolean;
+}
+
 export class Category {
     id: number;
     name: string;
@@ -71,6 +76,12 @@ export class OpponentFound {
     gameCode: string;
 }
 
+export class OpponentAnswer {
+    gameCode: string;
+    playerID: number;
+    isCorrect: boolean;
+}
+
 export abstract class IMutation {
     abstract createGame(gameData: GameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
 
@@ -86,13 +97,15 @@ export abstract class IMutation {
 
     abstract stopGame(gameCode: string): Nullable<boolean> | Promise<Nullable<boolean>>;
 
-    abstract endRound(gameCode: string): Nullable<boolean> | Promise<Nullable<boolean>>;
+    abstract endRound(gameCode: string, currentAnswer?: Nullable<CurrentAnswer>): Nullable<boolean> | Promise<Nullable<boolean>>;
 }
 
 export abstract class ISubscription {
     abstract newQuestion(gameCode: string): Question | Promise<Question>;
 
     abstract opponentFound(playerID: number): OpponentFound | Promise<OpponentFound>;
+
+    abstract opponentAnswer(gameCode: string, playerID: number): OpponentAnswer | Promise<OpponentAnswer>;
 }
 
 export class HistoryQuestion {

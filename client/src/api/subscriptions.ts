@@ -23,3 +23,11 @@ export const ON_OPPONENT_FOUND = gql`
     }
   }
 `;
+
+export const ON_OPPONENT_ANSWER = gql`
+  subscription OnOpponentAnswer($gameCode: String!, $playerID: Int!) {
+    opponentAnswer(gameCode: $gameCode, playerID: $playerID) {
+      isCorrect
+    }
+  }
+`;
