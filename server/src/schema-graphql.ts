@@ -117,6 +117,7 @@ export class HistoryInput {
     id: number;
     categoryName: string;
     questions: HistoryQuestion[];
+    opponentName?: Nullable<string>;
 }
 
 export class History {

@@ -84,7 +84,8 @@ const PregamePage = () => {
     }
     try {
       if (gameData.gameMode === GameMode.Multiplayer) {
-        seekGame({
+        setShowWaitingScreen(true);
+        await seekGame({
           variables: {
             seekGameInput: {
               categoryName: gameData.categoryName,
@@ -92,13 +93,13 @@ const PregamePage = () => {
             },
           },
         });
-        setShowWaitingScreen(true);
         return;
       }
     } catch (error: any) {
       if (error.message === "Unauthorized") {
         await refreshTokens();
         startGame(e);
+        return;
       }
     }
 

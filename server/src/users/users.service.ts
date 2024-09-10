@@ -5,11 +5,13 @@ import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { hash } from 'bcrypt';
 import { GoogleUserDTO } from 'src/auth/dto/google-user.dto';
+import { Game } from 'src/entities/game.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(Game) private gamesRepository: Repository<Game>,
   ) {}
 
   async findByEmail(email: string) {
@@ -41,74 +43,98 @@ export class UsersService {
     return await this.usersRepository.update(userID, { refreshToken });
   }
 
-  async getUserGamesHistory(
-    user: User,
-    offset: number | undefined,
-    limit: number | undefined,
-  ): Promise<{ rawResult: any; totalCount: number }> {
-    const finalOffset = offset || 0;
-    const finalLimit = limit || 3;
-    console.log(finalOffset, finalLimit);
-
-    const totalCount = await this.usersRepository
-      .createQueryBuilder('user')
-      .leftJoin('user.gamesAsPlayerOne', 'soloGames')
-      .select('COUNT(soloGames.id) as count')
-      .where('user.id = :id', { id: user.id })
-      .andWhere('soloGames.isFinished = :isFinished', { isFinished: true })
+  async getUserGamesHistory(user: User) {
+    const totalCount = await this.gamesRepository
+      .createQueryBuilder('game')
+      .select(['COUNT(game.id) as count'])
+      .where(
+        '(game.playerOneId = :id OR game.playerTwoId = :id) AND game.isFinished = :isFinished',
+        {
+          id: user.id,
+          isFinished: true,
+        },
+      )
       .getRawOne();
-    const gameIDs = await this.usersRepository
-      .createQueryBuilder('user')
-      .leftJoin('user.gamesAsPlayerOne', 'soloGames')
-      .select('soloGames.id as id')
-      .where('user.id = :id', { id: user.id })
-      .andWhere('soloGames.isFinished = :isFinished', { isFinished: true })
-      .orderBy('soloGames.id', 'DESC')
-      .offset(finalOffset)
-      .limit(finalLimit)
+
+    const soloGameIDs = await this.gamesRepository
+      .createQueryBuilder('game')
+      .select('game.id as id')
+      .where('game.playerOneId = :id', { id: user.id })
+      .andWhere('game.playerTwoId IS NULL')
+      .andWhere('game.isFinished = :isFinished', { isFinished: true })
+      .orderBy('game.id', 'DESC')
       .getRawMany();
 
-    if (gameIDs.length === 0) {
-      return { rawResult: [], totalCount: 0 };
+    const multiplayerGameIDs = await this.gamesRepository
+      .createQueryBuilder('game')
+      .select('game.id as id')
+      .where('game.playerOneId = :id AND game.playerTwoId IS NOT NULL', {
+        id: user.id,
+      })
+      .orWhere('game.playerTwoId = :id AND game.playerOneId IS NOT NULL', {
+        id: user.id,
+      })
+      .orderBy('game.id', 'DESC')
+      .getRawMany();
+
+    let soloGames: any[] | undefined;
+    let multiplayerGames: any[] | undefined;
+
+    if (soloGameIDs.length !== 0) {
+      soloGames = await this.gamesRepository
+        .createQueryBuilder('game')
+        .leftJoin('game.category', 'category')
+        .leftJoin('game.playerAnswers', 'soloGamePlayerAnswers')
+        .leftJoin('soloGamePlayerAnswers.question', 'soloGameQuestion')
+        .select([
+          'game.id as id',
+          'category.name as categoryName',
+          'soloGameQuestion.name as questionName',
+          'soloGamePlayerAnswers.isCorrect as isCorrectlyAnswered',
+        ])
+        .where('game.id IN (:...ids)', {
+          ids: soloGameIDs.map((game) => game.id),
+        })
+        .orderBy('game.id', 'DESC')
+        .getRawMany();
     }
 
-    const soloGames = await this.usersRepository
-      .createQueryBuilder('user')
-      .leftJoin('user.gamesAsPlayerOne', 'soloGames')
-      .leftJoin('soloGames.category', 'category')
-      .leftJoin('soloGames.playerAnswers', 'soloGamePlayerAnswers')
-      .leftJoin('soloGamePlayerAnswers.question', 'soloGameQuestion')
-      .select([
-        'soloGames.id as id',
-        'category.name as categoryName',
-        'soloGameQuestion.name as questionName',
-        'soloGamePlayerAnswers.isCorrect as isCorrectlyAnswered',
-      ])
-      .where('soloGames.id IN (:...ids)', {
-        ids: gameIDs.map((game) => game.id),
-      })
-      .orderBy('soloGames.id', 'DESC')
-      .getRawMany();
+    if (multiplayerGameIDs.length !== 0) {
+      multiplayerGames = await this.gamesRepository
+        .createQueryBuilder('game')
+        .leftJoin('game.category', 'category')
+        .leftJoin('game.playerAnswers', 'multiplayerGamePlayerAnswers')
+        .leftJoin(
+          'multiplayerGamePlayerAnswers.question',
+          'multiplayerGameQuestion',
+        )
+        .leftJoin('game.playerOne', 'playerOne')
+        .leftJoin('game.playerTwo', 'playerTwo')
+        .select([
+          'game.id as id',
+          'category.name as categoryName',
+          'multiplayerGameQuestion.name as questionName',
+          'multiplayerGamePlayerAnswers.isCorrect as isCorrectlyAnswered',
+          `CASE 
+            WHEN playerOne.id = :id THEN playerTwo.username
+            WHEN playerTwo.id = :id THEN playerOne.username END as opponentName`,
+        ])
+        .where('game.id IN (:...ids)', {
+          ids: multiplayerGameIDs.map((game) => game.id),
+        })
+        .andWhere('(playerOne.id = :id OR playerTwo.id = :id)', { id: user.id })
+        .andWhere('multiplayerGamePlayerAnswers.playerId = :id', {
+          id: user.id,
+        })
+        .orderBy('game.id', 'DESC')
+        .getRawMany();
+    }
 
-    // const multiplayerGames = await this.usersRepository
-    //   .createQueryBuilder('user')
-    //   .leftJoin('user.gamesAsPlayerTwo', 'multiGames')
-    //   .innerJoin('multiGames.playerOne', 'playerOne')
-    //   .leftJoin('multiGames.category', 'category')
-    //   .leftJoin('multiGames.playerAnswers', 'multiGamePlayerAnswers')
-    //   .leftJoin('multiGamePlayerAnswers.question', 'multiGameQuestion')
-    //   .select([
-    //     'multiGames.id as id',
-    //     'category.name as categoryName',
-    //     'multiGameQuestion.name as questionName',
-    //     'multiGamePlayerAnswers.isCorrect as isCorrectlyAnswered',
-    //     'playerOne.username as opponentUsername',
-    //   ])
-    //   .where('user.id = :id', { id: user.id })
-    //   .andWhere('multiGames.isFinished = :isFinished', { isFinished: true })
-    //   .getRawMany();
-
-    // console.log(multiplayerGames);
-    return { rawResult: soloGames, totalCount: totalCount.count };
+    return {
+      rawResult: [...(soloGames || []), ...(multiplayerGames || [])].sort(
+        (a, b) => b.id - a.id,
+      ),
+      totalCount: totalCount.count,
+    };
   }
 }
