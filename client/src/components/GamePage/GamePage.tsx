@@ -81,6 +81,7 @@ const GamePage = () => {
   const [showOpponentAnswer, setShowOpponentAnswer] = useState(false);
   const playerPoints = useRef(0);
   const questionAmount = useRef(0);
+  const unansweredQuestionIDs = useRef<number[]>([]);
 
   const startGame = async () => {
     const gameData = location.state.gameData;
@@ -109,12 +110,24 @@ const GamePage = () => {
     }
   };
 
+  const handleTimerEnd = () => {
+    setShowCorrectAnswer(true);
+    setPlayerAnswers((prev) => {
+      return [
+        ...prev,
+        { questionID: unansweredQuestionIDs.current.pop()!, isCorrect: false },
+      ];
+    });
+  };
+
   const handleAnswerSelection = (isCorrect: boolean, questionID: number) => {
     if (isCorrect) {
       playerPoints.current += 1;
     }
     setShowCorrectAnswer(true);
-
+    unansweredQuestionIDs.current = unansweredQuestionIDs.current.filter(
+      (id) => id !== questionID
+    );
     setPlayerAnswers((prev) => {
       return [...prev, { questionID, isCorrect }];
     });
@@ -159,6 +172,7 @@ const GamePage = () => {
     if (data?.newQuestion) {
       setQuestionNumber((prev) => prev + 1);
       setShowOpponentAnswer(false);
+      unansweredQuestionIDs.current.push(data.newQuestion.id);
     }
     if (data?.newQuestion.questionAmount) {
       questionAmount.current = data.newQuestion.questionAmount;
@@ -222,7 +236,7 @@ const GamePage = () => {
               key={data.newQuestion.startTime}
               startTime={data.newQuestion.startTime}
               duration={data.newQuestion.duration}
-              onTimerEnd={() => setShowCorrectAnswer(true)}
+              onTimerEnd={handleTimerEnd}
               onTimerStart={() => setShowCorrectAnswer(false)}
             />
           </div>
