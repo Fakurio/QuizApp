@@ -93,7 +93,7 @@ export abstract class IMutation {
 
     abstract cancelSeekingGame(seekGameInput: SeekGameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
 
-    abstract sendGameSummary(gameCode: string, playerAnswers: PlayerAnswers[], playerScore: number): Nullable<boolean> | Promise<Nullable<boolean>>;
+    abstract sendGameSummary(gameCode: string, playerAnswers: PlayerAnswers[], playerScore: number): HistoryInput | Promise<HistoryInput>;
 
     abstract stopGame(gameCode: string): Nullable<boolean> | Promise<Nullable<boolean>>;
 

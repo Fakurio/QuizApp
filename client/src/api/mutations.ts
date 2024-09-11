@@ -33,7 +33,15 @@ export const SEND_GAME_SUMMARY_MUTATION = gql`
       gameCode: $gameCode
       playerAnswers: $playerAnswers
       playerScore: $playerScore
-    )
+    ) {
+      id
+      categoryName
+      questions {
+        questionName
+        isCorrectlyAnswered
+      }
+      opponentName
+    }
   }
 `;
 

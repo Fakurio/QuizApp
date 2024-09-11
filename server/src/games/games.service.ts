@@ -143,7 +143,7 @@ export class GamesService {
     playerScore: number,
   ) {
     const game = await this.gameRepository.findOne({
-      relations: ['playerOne', 'playerTwo'],
+      relations: ['playerOne', 'playerTwo', 'category'],
       where: { gameCode },
     });
     if (game.playerTwo !== null) {
@@ -159,6 +159,7 @@ export class GamesService {
       game.isFinished = true;
       await this.gameRepository.save(game);
     }
+    const questions = [];
     for (const playerAnswer of playerAnswers) {
       const answer = new PlayerAnswersEntity();
       answer.game = game;
@@ -167,8 +168,19 @@ export class GamesService {
       answer.question = await this.categoryService.getQuestionByID(
         playerAnswer.questionID,
       );
+      questions.push({
+        questionName: answer.question.name,
+        isCorrectlyAnswered: answer.isCorrect,
+      });
       await this.playerAnswersRepository.save(answer);
     }
+
+    return {
+      id: game.id,
+      categoryName: game.category.name,
+      questions,
+      opponentName: game.playerTwo ? game.playerTwo.username : 'Solo game',
+    };
   }
 
   async seekGame(user: User, seekGameInput: SeekGameInput) {

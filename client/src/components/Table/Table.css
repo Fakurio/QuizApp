@@ -3,6 +3,7 @@
   border-radius: 0.5rem;
   border-collapse: collapse;
   margin-top: 1.2rem;
+  width: 100%;
 }
 
 .table__heading {

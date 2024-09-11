@@ -60,12 +60,6 @@ const createApolloClient = async (token: string | undefined) => {
           fields: {
             getUserGamesHistory: {
               keyArgs: false,
-              merge(existing = {}, incoming) {
-                return {
-                  ...incoming,
-                  history: [...(existing.history || []), ...incoming.history],
-                };
-              },
             },
           },
         },

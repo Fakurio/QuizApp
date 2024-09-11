@@ -46,10 +46,6 @@ const HistoryPage = () => {
     }
   }, [data]);
 
-  const refreshHistory = () => {
-    window.location.reload();
-  };
-
   if (!user) {
     return (
       <div className="history-page">
@@ -80,11 +76,6 @@ const HistoryPage = () => {
   }
   return (
     <div className="history-page">
-      <Button
-        text="Refresh history"
-        onClick={() => refreshHistory()}
-        className="history-page__button"
-      />
       {data && data.getUserGamesHistory.history.length > 0 ? (
         <>
           {showMobile ? (
@@ -107,6 +98,19 @@ const HistoryPage = () => {
             fetchMore({
               variables: {
                 offset: data.getUserGamesHistory.history.length,
+              },
+              updateQuery(prev, { fetchMoreResult }) {
+                if (!fetchMoreResult) return prev;
+                return {
+                  getUserGamesHistory: {
+                    ...prev.getUserGamesHistory,
+                    history: [
+                      ...prev.getUserGamesHistory.history,
+                      ...fetchMoreResult.getUserGamesHistory.history,
+                    ],
+                    totalCount: fetchMoreResult.getUserGamesHistory.totalCount,
+                  },
+                };
               },
             })
           }

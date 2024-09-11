@@ -63,7 +63,7 @@ type Mutation {
     gameCode: String!
     playerAnswers: [PlayerAnswers!]!
     playerScore: Int!
-  ): Boolean
+  ): HistoryInput!
   stopGame(gameCode: String!): Boolean
   endRound(gameCode: String!, currentAnswer: CurrentAnswer): Boolean
 }

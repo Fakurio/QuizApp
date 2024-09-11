@@ -3,6 +3,7 @@ import Button from "../Button/Button";
 import "./GameSummary.css";
 import { SEND_GAME_SUMMARY_MUTATION } from "../../api/mutations";
 import {
+  GetUserGamesHistoryQuery,
   PlayerAnswers,
   SendGameSummaryMutation,
   SendGameSummaryMutationVariables,
@@ -10,6 +11,7 @@ import {
 import { useMutation } from "@apollo/client";
 import { useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import { USER_GAME_HISTORY_QUERY } from "../../api/queries";
 
 interface GameSummaryProps {
   gameCode: string;
@@ -25,7 +27,28 @@ const GameSummary = ({
   const [sendGameSummary] = useMutation<
     SendGameSummaryMutation,
     SendGameSummaryMutationVariables
-  >(SEND_GAME_SUMMARY_MUTATION);
+  >(SEND_GAME_SUMMARY_MUTATION, {
+    update(cache, { data }) {
+      const existingData = cache.readQuery<GetUserGamesHistoryQuery>({
+        query: USER_GAME_HISTORY_QUERY,
+      });
+      if (existingData) {
+        cache.writeQuery({
+          query: USER_GAME_HISTORY_QUERY,
+          data: {
+            getUserGamesHistory: {
+              ...existingData.getUserGamesHistory,
+              history: [
+                data?.sendGameSummary,
+                ...existingData.getUserGamesHistory.history,
+              ],
+              totalCount: existingData.getUserGamesHistory.totalCount + 1,
+            },
+          },
+        });
+      }
+    },
+  });
   const { refreshTokens } = useAuth();
 
   useEffect(() => {
@@ -46,7 +69,6 @@ const GameSummary = ({
         }
       }
     };
-    console.log("GameSummaryProps", playerPoints, playerAnswers, gameCode);
     sendGameSummaryToServer();
   }, []);
 
