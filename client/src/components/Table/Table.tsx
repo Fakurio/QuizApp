@@ -41,6 +41,11 @@ const Table = ({ columns, items }: TableProps) => {
               <td className="table__cell">
                 {question.isCorrectlyAnswered ? "Yes" : "No"}
               </td>
+              {index === 0 && (
+                <td className="table_cell" rowSpan={item.questions.length}>
+                  {item.opponentName}
+                </td>
+              )}
             </tr>
           ))
         )}

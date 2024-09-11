@@ -15,14 +15,14 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 const documents = {
     "\n  mutation StopGame($gameCode: String!) {\n    stopGame(gameCode: $gameCode)\n  }\n": types.StopGameDocument,
     "\n  mutation createGame($gameData: GameInput!) {\n    createGame(gameData: $gameData)\n  }\n": types.CreateGameDocument,
-    "\n  mutation endRound($gameCode: String!) {\n    endRound(gameCode: $gameCode)\n  }\n": types.EndRoundDocument,
+    "\n  mutation endRound($gameCode: String!, $currentAnswer: CurrentAnswer) {\n    endRound(gameCode: $gameCode, currentAnswer: $currentAnswer)\n  }\n": types.EndRoundDocument,
     "\n  mutation createSoloGame($gameData: GameInput!) {\n    createSoloGame(gameData: $gameData)\n  }\n": types.CreateSoloGameDocument,
     "\n  mutation sendGameSummary(\n    $gameCode: String!\n    $playerAnswers: [PlayerAnswers!]!\n    $playerScore: Int!\n  ) {\n    sendGameSummary(\n      gameCode: $gameCode\n      playerAnswers: $playerAnswers\n      playerScore: $playerScore\n    )\n  }\n": types.SendGameSummaryDocument,
     "\n  mutation seekGame($seekGameInput: SeekGameInput!) {\n    seekGame(seekGameInput: $seekGameInput)\n  }\n": types.SeekGameDocument,
     "\n  mutation cancelSeekingGame($seekGameInput: SeekGameInput!) {\n    cancelSeekingGame(seekGameInput: $seekGameInput)\n  }\n": types.CancelSeekingGameDocument,
     "\n  query GetDifficulties {\n    difficulties {\n      id\n      name\n    }\n  }\n": types.GetDifficultiesDocument,
     "\n  query GetCategories {\n    categories {\n      id\n      name\n      logo\n    }\n  }\n": types.GetCategoriesDocument,
-    "\n  query getUserGamesHistory($offset: Int, $limit: Int) {\n    getUserGamesHistory(offset: $offset, limit: $limit) {\n      totalCount\n      history {\n        id\n        categoryName\n        questions {\n          questionName\n          isCorrectlyAnswered\n        }\n      }\n    }\n  }\n": types.GetUserGamesHistoryDocument,
+    "\n  query getUserGamesHistory($offset: Int, $limit: Int) {\n    getUserGamesHistory(offset: $offset, limit: $limit) {\n      totalCount\n      history {\n        id\n        categoryName\n        questions {\n          questionName\n          isCorrectlyAnswered\n        }\n        opponentName\n      }\n    }\n  }\n": types.GetUserGamesHistoryDocument,
     "\n  subscription OnNewQuestion($gameCode: String!) {\n    newQuestion(gameCode: $gameCode) {\n      id\n      name\n      answer {\n        correct\n        incorrect\n      }\n      startTime\n      duration\n      latency\n      questionAmount\n    }\n  }\n": types.OnNewQuestionDocument,
     "\n  subscription OnOpponentFound($playerID: Int!) {\n    opponentFound(playerID: $playerID) {\n      gameCode\n    }\n  }\n": types.OnOpponentFoundDocument,
     "\n  subscription OnOpponentAnswer($gameCode: String!, $playerID: Int!) {\n    opponentAnswer(gameCode: $gameCode, playerID: $playerID) {\n      isCorrect\n    }\n  }\n": types.OnOpponentAnswerDocument,
@@ -53,7 +53,7 @@ export function gql(source: "\n  mutation createGame($gameData: GameInput!) {\n 
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation endRound($gameCode: String!) {\n    endRound(gameCode: $gameCode)\n  }\n"): (typeof documents)["\n  mutation endRound($gameCode: String!) {\n    endRound(gameCode: $gameCode)\n  }\n"];
+export function gql(source: "\n  mutation endRound($gameCode: String!, $currentAnswer: CurrentAnswer) {\n    endRound(gameCode: $gameCode, currentAnswer: $currentAnswer)\n  }\n"): (typeof documents)["\n  mutation endRound($gameCode: String!, $currentAnswer: CurrentAnswer) {\n    endRound(gameCode: $gameCode, currentAnswer: $currentAnswer)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -81,7 +81,7 @@ export function gql(source: "\n  query GetCategories {\n    categories {\n      
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query getUserGamesHistory($offset: Int, $limit: Int) {\n    getUserGamesHistory(offset: $offset, limit: $limit) {\n      totalCount\n      history {\n        id\n        categoryName\n        questions {\n          questionName\n          isCorrectlyAnswered\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query getUserGamesHistory($offset: Int, $limit: Int) {\n    getUserGamesHistory(offset: $offset, limit: $limit) {\n      totalCount\n      history {\n        id\n        categoryName\n        questions {\n          questionName\n          isCorrectlyAnswered\n        }\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query getUserGamesHistory($offset: Int, $limit: Int) {\n    getUserGamesHistory(offset: $offset, limit: $limit) {\n      totalCount\n      history {\n        id\n        categoryName\n        questions {\n          questionName\n          isCorrectlyAnswered\n        }\n        opponentName\n      }\n    }\n  }\n"): (typeof documents)["\n  query getUserGamesHistory($offset: Int, $limit: Int) {\n    getUserGamesHistory(offset: $offset, limit: $limit) {\n      totalCount\n      history {\n        id\n        categoryName\n        questions {\n          questionName\n          isCorrectlyAnswered\n        }\n        opponentName\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

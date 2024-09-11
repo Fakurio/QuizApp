@@ -29,6 +29,7 @@ export const USER_GAME_HISTORY_QUERY = gql`
           questionName
           isCorrectlyAnswered
         }
+        opponentName
       }
     }
   }

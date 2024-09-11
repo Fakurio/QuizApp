@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import MobileTable from "../MobileTable/MobileTable";
 import Button from "../Button/Button";
 
-const columns = ["Category", "Questions", "Correctly Answered"];
+const columns = ["Category", "Questions", "Correctly Answered", "Opponent"];
 
 const HistoryPage = () => {
   const { user } = useAuth();
