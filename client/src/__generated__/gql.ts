@@ -20,12 +20,14 @@ const documents = {
     "\n  mutation sendGameSummary(\n    $gameCode: String!\n    $playerAnswers: [PlayerAnswers!]!\n    $playerScore: Int!\n  ) {\n    sendGameSummary(\n      gameCode: $gameCode\n      playerAnswers: $playerAnswers\n      playerScore: $playerScore\n    ) {\n      id\n      categoryName\n      questions {\n        questionName\n        isCorrectlyAnswered\n      }\n      opponentName\n    }\n  }\n": types.SendGameSummaryDocument,
     "\n  mutation seekGame($seekGameInput: SeekGameInput!) {\n    seekGame(seekGameInput: $seekGameInput)\n  }\n": types.SeekGameDocument,
     "\n  mutation cancelSeekingGame($seekGameInput: SeekGameInput!) {\n    cancelSeekingGame(seekGameInput: $seekGameInput)\n  }\n": types.CancelSeekingGameDocument,
+    "\n  mutation playerDisconnected($playerID: Int!) {\n    playerDisconnected(playerID: $playerID)\n  }\n": types.PlayerDisconnectedDocument,
     "\n  query GetDifficulties {\n    difficulties {\n      id\n      name\n    }\n  }\n": types.GetDifficultiesDocument,
     "\n  query GetCategories {\n    categories {\n      id\n      name\n      logo\n    }\n  }\n": types.GetCategoriesDocument,
     "\n  query getUserGamesHistory($offset: Int, $limit: Int) {\n    getUserGamesHistory(offset: $offset, limit: $limit) {\n      totalCount\n      history {\n        id\n        categoryName\n        questions {\n          questionName\n          isCorrectlyAnswered\n        }\n        opponentName\n      }\n    }\n  }\n": types.GetUserGamesHistoryDocument,
     "\n  subscription OnNewQuestion($gameCode: String!) {\n    newQuestion(gameCode: $gameCode) {\n      id\n      name\n      answer {\n        correct\n        incorrect\n      }\n      startTime\n      duration\n      latency\n      questionAmount\n    }\n  }\n": types.OnNewQuestionDocument,
     "\n  subscription OnOpponentFound($playerID: Int!) {\n    opponentFound(playerID: $playerID) {\n      gameCode\n    }\n  }\n": types.OnOpponentFoundDocument,
     "\n  subscription OnOpponentAnswer($gameCode: String!, $playerID: Int!) {\n    opponentAnswer(gameCode: $gameCode, playerID: $playerID) {\n      isCorrect\n    }\n  }\n": types.OnOpponentAnswerDocument,
+    "\n  subscription OnOpponentDisconnected($gameCode: String!) {\n    opponentDisconnected(gameCode: $gameCode) {\n      gameCode\n    }\n  }\n": types.OnOpponentDisconnectedDocument,
 };
 
 /**
@@ -73,6 +75,10 @@ export function gql(source: "\n  mutation cancelSeekingGame($seekGameInput: Seek
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  mutation playerDisconnected($playerID: Int!) {\n    playerDisconnected(playerID: $playerID)\n  }\n"): (typeof documents)["\n  mutation playerDisconnected($playerID: Int!) {\n    playerDisconnected(playerID: $playerID)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query GetDifficulties {\n    difficulties {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query GetDifficulties {\n    difficulties {\n      id\n      name\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -94,6 +100,10 @@ export function gql(source: "\n  subscription OnOpponentFound($playerID: Int!) {
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  subscription OnOpponentAnswer($gameCode: String!, $playerID: Int!) {\n    opponentAnswer(gameCode: $gameCode, playerID: $playerID) {\n      isCorrect\n    }\n  }\n"): (typeof documents)["\n  subscription OnOpponentAnswer($gameCode: String!, $playerID: Int!) {\n    opponentAnswer(gameCode: $gameCode, playerID: $playerID) {\n      isCorrect\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  subscription OnOpponentDisconnected($gameCode: String!) {\n    opponentDisconnected(gameCode: $gameCode) {\n      gameCode\n    }\n  }\n"): (typeof documents)["\n  subscription OnOpponentDisconnected($gameCode: String!) {\n    opponentDisconnected(gameCode: $gameCode) {\n      gameCode\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

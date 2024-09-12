@@ -131,6 +131,13 @@ export class GamesService {
     console.log('Gra stop', gameCode);
     const game = this.activeGames.get(gameCode);
     if (game) {
+      if (game.gameMode === GameMode.Multiplayer) {
+        this.pubSub.publish('opponentDisconnected', {
+          opponentDisconnected: {
+            gameCode,
+          },
+        });
+      }
       clearInterval(game.timerID);
       this.activeGames.delete(gameCode);
     }
@@ -179,7 +186,12 @@ export class GamesService {
       id: game.id,
       categoryName: game.category.name,
       questions,
-      opponentName: game.playerTwo ? game.playerTwo.username : 'Solo game',
+      opponentName:
+        game.playerTwo === null
+          ? 'Solo game'
+          : game.playerOne.id === user.id
+            ? game.playerTwo.username
+            : game.playerOne.username,
     };
   }
 
@@ -203,14 +215,12 @@ export class GamesService {
     } else {
       playersIDs.push(user.id);
     }
-    console.log(this.seekGames);
   }
 
   async cancelSeekingGame(user: User, seekGameInput: SeekGameInput) {
     const { categoryName, difficultyName } = seekGameInput;
     const playersIDs = this.seekGames.get(categoryName)[difficultyName];
     playersIDs.splice(playersIDs.indexOf(user.id), 1);
-    console.log(this.seekGames);
   }
 
   private async openSoloGame(
@@ -292,6 +302,7 @@ export class GamesService {
     if (!game) {
       return;
     }
+    game.numberOfAnswers = 0;
     const nextQuestion = game.questions.shift();
     if (!nextQuestion) {
       console.log('Koniec gry', gameCode);

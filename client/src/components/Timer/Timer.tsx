@@ -26,7 +26,7 @@ const Timer = ({
       setTime((prevTime) => {
         if (prevTime <= 0) {
           if (onTimerEnd) {
-            onTimerEnd();
+            setTimeout(onTimerEnd, 0);
           }
           clearInterval(interval);
           return 0;

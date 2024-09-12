@@ -21,6 +21,8 @@ import {
   PlayerAnswers,
   OnOpponentAnswerSubscription,
   OnOpponentAnswerSubscriptionVariables,
+  OnOpponentDisconnectedSubscription,
+  OnOpponentDisconnectedSubscriptionVariables,
 } from "../../__generated__/graphql";
 import QuestionCard from "../QuestionCard/QuestionCard";
 import { useEffect, useState, useRef } from "react";
@@ -33,7 +35,11 @@ import {
   END_ROUND_MUTATION,
   CREATE_SOLO_GAME_MUTATION,
 } from "../../api/mutations";
-import { ON_NEW_QUESTION, ON_OPPONENT_ANSWER } from "../../api/subscriptions";
+import {
+  ON_NEW_QUESTION,
+  ON_OPPONENT_ANSWER,
+  ON_OPPONENT_DISCONNECTED,
+} from "../../api/subscriptions";
 import { useAuth } from "../../contexts/AuthContext";
 
 const GamePage = () => {
@@ -66,6 +72,14 @@ const GamePage = () => {
     variables: {
       gameCode: location.state.gameData.gameCode,
       playerID: user?.id || 0,
+    },
+  });
+  const { data: opponentDisconnected } = useSubscription<
+    OnOpponentDisconnectedSubscription,
+    OnOpponentDisconnectedSubscriptionVariables
+  >(ON_OPPONENT_DISCONNECTED, {
+    variables: {
+      gameCode: location.state.gameData.gameCode,
     },
   });
   const [stopGame] = useMutation<StopGameMutation, StopGameMutationVariables>(
@@ -112,12 +126,17 @@ const GamePage = () => {
 
   const handleTimerEnd = () => {
     setShowCorrectAnswer(true);
-    setPlayerAnswers((prev) => {
-      return [
-        ...prev,
-        { questionID: unansweredQuestionIDs.current.pop()!, isCorrect: false },
-      ];
-    });
+    if (unansweredQuestionIDs.current.length !== 0) {
+      setPlayerAnswers((prev) => {
+        return [
+          ...prev,
+          {
+            questionID: unansweredQuestionIDs.current.pop()!,
+            isCorrect: false,
+          },
+        ];
+      });
+    }
   };
 
   const handleAnswerSelection = (isCorrect: boolean, questionID: number) => {
@@ -193,6 +212,14 @@ const GamePage = () => {
     }
   }, [opponentAnswer]);
 
+  useEffect(() => {
+    if (opponentDisconnected?.opponentDisconnected) {
+      alert("Opponent disconnected");
+      localStorage.removeItem("gameCode");
+      navigate("/", { replace: true });
+    }
+  }, [opponentDisconnected]);
+
   if (!location.state) {
     return <Navigate to="/" />;
   }
@@ -217,7 +244,7 @@ const GamePage = () => {
     return (
       <div className="game-page">
         <GameSummary
-          gameCode={location.state.gameData.gameCode}
+          gameCode={user ? location.state.gameData.gameCode : null}
           playerPoints={playerPoints.current}
           playerAnswers={playerAnswers}
         />

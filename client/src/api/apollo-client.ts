@@ -34,9 +34,37 @@ const createApolloClient = async (token: string | undefined) => {
     };
   });
 
+  const onDisconnect = () => {
+    const headers = {
+      type: "application/json",
+    };
+    const gameCode = localStorage.getItem("gameCode");
+    localStorage.removeItem("gameCode");
+    const payload = new Blob(
+      [
+        JSON.stringify({
+          query: `mutation StopGame($gameCode: String!) {
+            stopGame(gameCode: $gameCode)
+          }`,
+          variables: { gameCode },
+        }),
+      ],
+      headers
+    );
+    navigator.sendBeacon(`${import.meta.env.VITE_HTML_URL}/graphql`, payload);
+  };
+
   const wsLink = new GraphQLWsLink(
     createClient({
       url: `${import.meta.env.VITE_WS_URL}/graphql`,
+      on: {
+        connected: () => {
+          window.addEventListener("beforeunload", onDisconnect);
+        },
+        closed: () => {
+          window.removeEventListener("beforeunload", onDisconnect);
+        },
+      },
     })
   );
 
@@ -52,7 +80,7 @@ const createApolloClient = async (token: string | undefined) => {
     authLink.concat(httpLink)
   );
 
-  return new ApolloClient({
+  const client = new ApolloClient({
     link: splitLink,
     cache: new InMemoryCache({
       typePolicies: {
@@ -66,6 +94,8 @@ const createApolloClient = async (token: string | undefined) => {
       },
     }),
   });
+
+  return client;
 };
 
 export default createApolloClient;

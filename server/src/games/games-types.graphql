@@ -53,6 +53,10 @@ type OpponentAnswer {
   isCorrect: Boolean!
 }
 
+type OpponentDisconnected {
+  gameCode: String!
+}
+
 type Mutation {
   createGame(gameData: GameInput!): Boolean
   createSoloGame(gameData: GameInput!): Boolean
@@ -72,4 +76,5 @@ type Subscription {
   newQuestion(gameCode: String!): Question!
   opponentFound(playerID: Int!): OpponentFound!
   opponentAnswer(gameCode: String!, playerID: Int!): OpponentAnswer!
+  opponentDisconnected(gameCode: String!): OpponentDisconnected!
 }

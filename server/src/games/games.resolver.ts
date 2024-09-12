@@ -110,4 +110,13 @@ export class GamesResolver {
   sendEachOtherAnswers() {
     return this.pubSub.asyncIterator('opponentAnswer');
   }
+
+  @Subscription('opponentDisconnected', {
+    filter: (payload, variables) => {
+      return payload.opponentDisconnected.gameCode === variables.gameCode;
+    },
+  })
+  sendOpponentDisconnected() {
+    return this.pubSub.asyncIterator('opponentDisconnected');
+  }
 }

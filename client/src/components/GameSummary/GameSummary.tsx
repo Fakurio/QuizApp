@@ -14,7 +14,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { USER_GAME_HISTORY_QUERY } from "../../api/queries";
 
 interface GameSummaryProps {
-  gameCode: string;
+  gameCode: string | null;
   playerPoints: number;
   playerAnswers: PlayerAnswers[];
 }
@@ -57,7 +57,7 @@ const GameSummary = ({
       try {
         sendGameSummary({
           variables: {
-            gameCode: gameCode,
+            gameCode: gameCode!,
             playerAnswers: playerAnswers,
             playerScore: playerPoints,
           },
@@ -69,7 +69,10 @@ const GameSummary = ({
         }
       }
     };
-    sendGameSummaryToServer();
+    console.log(gameCode, playerAnswers);
+    if (gameCode) {
+      sendGameSummaryToServer();
+    }
   }, []);
 
   return (

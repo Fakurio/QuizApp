@@ -31,3 +31,11 @@ export const ON_OPPONENT_ANSWER = gql`
     }
   }
 `;
+
+export const ON_OPPONENT_DISCONNECTED = gql`
+  subscription OnOpponentDisconnected($gameCode: String!) {
+    opponentDisconnected(gameCode: $gameCode) {
+      gameCode
+    }
+  }
+`;

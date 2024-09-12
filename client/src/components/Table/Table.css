@@ -23,4 +23,5 @@
 
 .table__cell {
   padding: 1rem;
+  text-wrap: pretty;
 }

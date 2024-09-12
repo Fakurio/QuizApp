@@ -82,6 +82,10 @@ export class OpponentAnswer {
     isCorrect: boolean;
 }
 
+export class OpponentDisconnected {
+    gameCode: string;
+}
+
 export abstract class IMutation {
     abstract createGame(gameData: GameInput): Nullable<boolean> | Promise<Nullable<boolean>>;
 
@@ -106,6 +110,8 @@ export abstract class ISubscription {
     abstract opponentFound(playerID: number): OpponentFound | Promise<OpponentFound>;
 
     abstract opponentAnswer(gameCode: string, playerID: number): OpponentAnswer | Promise<OpponentAnswer>;
+
+    abstract opponentDisconnected(gameCode: string): OpponentDisconnected | Promise<OpponentDisconnected>;
 }
 
 export class HistoryQuestion {

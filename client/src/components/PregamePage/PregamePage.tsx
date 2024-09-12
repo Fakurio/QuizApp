@@ -144,6 +144,10 @@ const PregamePage = () => {
 
   useEffect(() => {
     if (onOpponentFoundData) {
+      localStorage.setItem(
+        "gameCode",
+        onOpponentFoundData.opponentFound.gameCode
+      );
       navigate("/game", {
         state: {
           gameData: {
