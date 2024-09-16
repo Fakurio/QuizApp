@@ -69,7 +69,6 @@ const GameSummary = ({
         }
       }
     };
-    console.log(gameCode, playerAnswers);
     if (gameCode) {
       sendGameSummaryToServer();
     }

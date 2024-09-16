@@ -4,6 +4,7 @@ import { CATEGORY_QUERY } from "../api/queries";
 import { GetCategoriesQuery } from "../__generated__/graphql";
 
 interface CategoriesContextI {
+  categories: GetCategoriesQuery["categories"] | undefined;
   filteredCategories: GetCategoriesQuery["categories"] | undefined;
   loading: boolean;
   error: ApolloError | undefined;
@@ -22,6 +23,9 @@ const CategoriesProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { data, loading, error } = useQuery<GetCategoriesQuery>(CATEGORY_QUERY);
+  const [categories, setCategories] = useState<
+    GetCategoriesQuery["categories"] | undefined
+  >(undefined);
   const [filteredCategories, setFilteredCategories] = useState<
     GetCategoriesQuery["categories"] | undefined
   >(undefined);
@@ -37,11 +41,13 @@ const CategoriesProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (data) {
+      setCategories(data.categories);
       setFilteredCategories(data.categories);
     }
   }, [data]);
 
   const value = {
+    categories,
     filteredCategories,
     loading,
     error,

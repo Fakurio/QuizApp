@@ -127,10 +127,10 @@ export class GamesService {
     game.playerTwoCurrentAnswer.isCorrect = null;
   }
 
-  stopGame(gameCode: string) {
+  stopGame(gameCode: string, isFinished = false) {
     console.log('Gra stop', gameCode);
     const game = this.activeGames.get(gameCode);
-    if (game) {
+    if (game && !isFinished) {
       if (game.gameMode === GameMode.Multiplayer) {
         this.pubSub.publish('opponentDisconnected', {
           opponentDisconnected: {
@@ -306,7 +306,7 @@ export class GamesService {
     const nextQuestion = game.questions.shift();
     if (!nextQuestion) {
       console.log('Koniec gry', gameCode);
-      this.stopGame(gameCode);
+      this.stopGame(gameCode, true);
       return;
     }
     console.log('Następne pytanie', gameCode);

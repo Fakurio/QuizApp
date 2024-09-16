@@ -4,15 +4,22 @@ import { useQuery } from "@apollo/client";
 import "./HistoryPage.css";
 import { USER_GAME_HISTORY_QUERY } from "../../api/queries";
 import {
+  GameMode,
   GetUserGamesHistoryQuery,
   GetUserGamesHistoryQueryVariables,
 } from "../../__generated__/graphql";
 import { useAuth } from "../../contexts/AuthContext";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import MobileTable from "../MobileTable/MobileTable";
 import Button from "../Button/Button";
+import Filterbar from "../Filterbar/Filterbar";
 
 const columns = ["Category", "Questions", "Correctly Answered", "Opponent"];
+
+export interface Filters {
+  category?: string;
+  gameMode?: string;
+}
 
 const HistoryPage = () => {
   const { user } = useAuth();
@@ -20,8 +27,12 @@ const HistoryPage = () => {
     GetUserGamesHistoryQuery,
     GetUserGamesHistoryQueryVariables
   >(USER_GAME_HISTORY_QUERY, { skip: !user });
+  const [filteredHistory, setFilteredHistory] = useState<
+    GetUserGamesHistoryQuery["getUserGamesHistory"]["history"]
+  >([]);
   const [showMobile, setShowMobile] = useState(false);
   const [isHistoryEnd, setIsHistoryEnd] = useState(false);
+  const filters = useRef<Filters>({});
 
   useEffect(() => {
     const handleResize = () => {
@@ -37,6 +48,9 @@ const HistoryPage = () => {
   }, []);
 
   useEffect(() => {
+    if (data) {
+      handleFiltersChange(filters.current);
+    }
     if (
       data &&
       data.getUserGamesHistory.history.length ===
@@ -45,6 +59,25 @@ const HistoryPage = () => {
       setIsHistoryEnd(true);
     }
   }, [data]);
+
+  const handleFiltersChange = (filters: Filters) => {
+    const newFilteredHistory =
+      data?.getUserGamesHistory.history.filter((input) => {
+        if (filters.category && input.categoryName !== filters.category) {
+          return false;
+        }
+        if (filters.gameMode) {
+          if (filters.gameMode === GameMode.Solo) {
+            return input.opponentName === "Solo game";
+          }
+          if (filters.gameMode === GameMode.Multiplayer) {
+            return input.opponentName !== "Solo game";
+          }
+        }
+        return true;
+      }) || [];
+    setFilteredHistory(newFilteredHistory);
+  };
 
   if (!user) {
     return (
@@ -76,15 +109,13 @@ const HistoryPage = () => {
   }
   return (
     <div className="history-page">
-      {data && data.getUserGamesHistory.history.length > 0 ? (
+      <Filterbar filters={filters} onFiltersChange={handleFiltersChange} />
+      {filteredHistory ? (
         <>
           {showMobile ? (
-            <MobileTable
-              columns={columns}
-              items={data.getUserGamesHistory.history}
-            />
+            <MobileTable columns={columns} items={filteredHistory} />
           ) : (
-            <Table columns={columns} items={data.getUserGamesHistory.history} />
+            <Table columns={columns} items={filteredHistory} />
           )}
         </>
       ) : (

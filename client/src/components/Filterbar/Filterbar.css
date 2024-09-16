@@ -1,0 +1,18 @@
+.filterbar {
+  background: var(--secondary-color);
+  width: 100%;
+  padding: 1rem;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  gap: 5rem;
+}
+
+.filterbar__select {
+  padding: 0.4rem;
+  border-radius: 5px;
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-family: inherit;
+}
