@@ -7,6 +7,7 @@ import RegisterForm from "./components/RegisterForm/RegisterForm";
 import LoginForm from "./components/LoginForm/LoginForm";
 import GoogleLoginPage from "./components/GoogleLoginPage/GoogleLoginPage";
 import HistoryPage from "./components/HistoryPage/HistoryPage";
+import HighlightsPage from "./components/HighlightsPage/HighlightsPage";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/login" Component={LoginForm} />
         <Route path="/google/login" Component={GoogleLoginPage} />
         <Route path="/history" Component={HistoryPage} />
+        <Route path="/highlights" Component={HighlightsPage} />
       </Routes>
     </div>
   );

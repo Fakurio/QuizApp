@@ -1,0 +1,9 @@
+type Highlight {
+  categoryName: String!
+  difficultyName: String!
+  avgScore: Float!
+}
+
+type Query {
+  getHighlights(categoryName: String!): [Highlight!]!
+}

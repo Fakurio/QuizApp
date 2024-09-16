@@ -34,3 +34,13 @@ export const USER_GAME_HISTORY_QUERY = gql`
     }
   }
 `;
+
+export const HIGHLIGHTS_QUERY = gql`
+  query GetHighlights($categoryName: String!) {
+    getHighlights(categoryName: $categoryName) {
+      categoryName
+      difficultyName
+      avgScore
+    }
+  }
+`;

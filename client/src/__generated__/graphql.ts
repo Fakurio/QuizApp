@@ -52,6 +52,13 @@ export enum GameMode {
   Solo = 'Solo'
 }
 
+export type Highlight = {
+  __typename?: 'Highlight';
+  avgScore: Scalars['Float']['output'];
+  categoryName: Scalars['String']['output'];
+  difficultyName: Scalars['String']['output'];
+};
+
 export type History = {
   __typename?: 'History';
   history: Array<HistoryInput>;
@@ -79,7 +86,6 @@ export type Mutation = {
   createMutliplayerGame?: Maybe<Scalars['Boolean']['output']>;
   createSoloGame?: Maybe<Scalars['Boolean']['output']>;
   endRound?: Maybe<Scalars['Boolean']['output']>;
-  playerDisconnected?: Maybe<Scalars['Boolean']['output']>;
   seekGame?: Maybe<Scalars['Boolean']['output']>;
   sendGameSummary: HistoryInput;
   stopGame?: Maybe<Scalars['Boolean']['output']>;
@@ -109,11 +115,6 @@ export type MutationCreateSoloGameArgs = {
 export type MutationEndRoundArgs = {
   currentAnswer?: InputMaybe<CurrentAnswer>;
   gameCode: Scalars['String']['input'];
-};
-
-
-export type MutationPlayerDisconnectedArgs = {
-  playerID: Scalars['Int']['input'];
 };
 
 
@@ -161,7 +162,13 @@ export type Query = {
   __typename?: 'Query';
   categories: Array<Category>;
   difficulties: Array<Difficulty>;
+  getHighlights: Array<Highlight>;
   getUserGamesHistory: History;
+};
+
+
+export type QueryGetHighlightsArgs = {
+  categoryName: Scalars['String']['input'];
 };
 
 
@@ -268,13 +275,6 @@ export type CancelSeekingGameMutationVariables = Exact<{
 
 export type CancelSeekingGameMutation = { __typename?: 'Mutation', cancelSeekingGame?: boolean | null };
 
-export type PlayerDisconnectedMutationVariables = Exact<{
-  playerID: Scalars['Int']['input'];
-}>;
-
-
-export type PlayerDisconnectedMutation = { __typename?: 'Mutation', playerDisconnected?: boolean | null };
-
 export type GetDifficultiesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -292,6 +292,13 @@ export type GetUserGamesHistoryQueryVariables = Exact<{
 
 
 export type GetUserGamesHistoryQuery = { __typename?: 'Query', getUserGamesHistory: { __typename?: 'History', totalCount: number, history: Array<{ __typename?: 'HistoryInput', id: number, categoryName: string, opponentName?: string | null, questions: Array<{ __typename?: 'HistoryQuestion', questionName: string, isCorrectlyAnswered: boolean }> }> } };
+
+export type GetHighlightsQueryVariables = Exact<{
+  categoryName: Scalars['String']['input'];
+}>;
+
+
+export type GetHighlightsQuery = { __typename?: 'Query', getHighlights: Array<{ __typename?: 'Highlight', categoryName: string, difficultyName: string, avgScore: number }> };
 
 export type OnNewQuestionSubscriptionVariables = Exact<{
   gameCode: Scalars['String']['input'];
@@ -330,10 +337,10 @@ export const CreateSoloGameDocument = {"kind":"Document","definitions":[{"kind":
 export const SendGameSummaryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"sendGameSummary"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"playerAnswers"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PlayerAnswers"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"playerScore"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sendGameSummary"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameCode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}}},{"kind":"Argument","name":{"kind":"Name","value":"playerAnswers"},"value":{"kind":"Variable","name":{"kind":"Name","value":"playerAnswers"}}},{"kind":"Argument","name":{"kind":"Name","value":"playerScore"},"value":{"kind":"Variable","name":{"kind":"Name","value":"playerScore"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"categoryName"}},{"kind":"Field","name":{"kind":"Name","value":"questions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"questionName"}},{"kind":"Field","name":{"kind":"Name","value":"isCorrectlyAnswered"}}]}},{"kind":"Field","name":{"kind":"Name","value":"opponentName"}}]}}]}}]} as unknown as DocumentNode<SendGameSummaryMutation, SendGameSummaryMutationVariables>;
 export const SeekGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"seekGame"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"seekGameInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SeekGameInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"seekGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"seekGameInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"seekGameInput"}}}]}]}}]} as unknown as DocumentNode<SeekGameMutation, SeekGameMutationVariables>;
 export const CancelSeekingGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"cancelSeekingGame"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"seekGameInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SeekGameInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cancelSeekingGame"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"seekGameInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"seekGameInput"}}}]}]}}]} as unknown as DocumentNode<CancelSeekingGameMutation, CancelSeekingGameMutationVariables>;
-export const PlayerDisconnectedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"playerDisconnected"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"playerID"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"playerDisconnected"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"playerID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"playerID"}}}]}]}}]} as unknown as DocumentNode<PlayerDisconnectedMutation, PlayerDisconnectedMutationVariables>;
 export const GetDifficultiesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDifficulties"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"difficulties"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetDifficultiesQuery, GetDifficultiesQueryVariables>;
 export const GetCategoriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCategories"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"categories"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"logo"}}]}}]}}]} as unknown as DocumentNode<GetCategoriesQuery, GetCategoriesQueryVariables>;
 export const GetUserGamesHistoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserGamesHistory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getUserGamesHistory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"history"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"categoryName"}},{"kind":"Field","name":{"kind":"Name","value":"questions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"questionName"}},{"kind":"Field","name":{"kind":"Name","value":"isCorrectlyAnswered"}}]}},{"kind":"Field","name":{"kind":"Name","value":"opponentName"}}]}}]}}]}}]} as unknown as DocumentNode<GetUserGamesHistoryQuery, GetUserGamesHistoryQueryVariables>;
+export const GetHighlightsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetHighlights"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"categoryName"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getHighlights"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"categoryName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"categoryName"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"categoryName"}},{"kind":"Field","name":{"kind":"Name","value":"difficultyName"}},{"kind":"Field","name":{"kind":"Name","value":"avgScore"}}]}}]}}]} as unknown as DocumentNode<GetHighlightsQuery, GetHighlightsQueryVariables>;
 export const OnNewQuestionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"OnNewQuestion"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"newQuestion"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameCode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"answer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"correct"}},{"kind":"Field","name":{"kind":"Name","value":"incorrect"}}]}},{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"latency"}},{"kind":"Field","name":{"kind":"Name","value":"questionAmount"}}]}}]}}]} as unknown as DocumentNode<OnNewQuestionSubscription, OnNewQuestionSubscriptionVariables>;
 export const OnOpponentFoundDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"OnOpponentFound"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"playerID"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"opponentFound"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"playerID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"playerID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gameCode"}}]}}]}}]} as unknown as DocumentNode<OnOpponentFoundSubscription, OnOpponentFoundSubscriptionVariables>;
 export const OnOpponentAnswerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"OnOpponentAnswer"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"playerID"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"opponentAnswer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameCode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameCode"}}},{"kind":"Argument","name":{"kind":"Name","value":"playerID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"playerID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"isCorrect"}}]}}]}}]} as unknown as DocumentNode<OnOpponentAnswerSubscription, OnOpponentAnswerSubscriptionVariables>;

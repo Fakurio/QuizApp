@@ -51,6 +51,8 @@ export abstract class IQuery {
 
     abstract difficulties(): Difficulty[] | Promise<Difficulty[]>;
 
+    abstract getHighlights(categoryName: string): Highlight[] | Promise<Highlight[]>;
+
     abstract getUserGamesHistory(offset?: Nullable<number>, limit?: Nullable<number>): History | Promise<History>;
 }
 
@@ -112,6 +114,12 @@ export abstract class ISubscription {
     abstract opponentAnswer(gameCode: string, playerID: number): OpponentAnswer | Promise<OpponentAnswer>;
 
     abstract opponentDisconnected(gameCode: string): OpponentDisconnected | Promise<OpponentDisconnected>;
+}
+
+export class Highlight {
+    categoryName: string;
+    difficultyName: string;
+    avgScore: number;
 }
 
 export class HistoryQuestion {

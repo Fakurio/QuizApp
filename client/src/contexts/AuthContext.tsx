@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface User {
   id: number;
@@ -35,6 +35,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null | string[]>("");
   const location = useLocation();
+  const navigate = useNavigate();
+  const refreshRetries = useRef(0);
 
   const refreshTokens = async () => {
     const response = await fetch(`${import.meta.env.VITE_HTML_URL}/auth/me`, {
@@ -43,9 +45,15 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     if (!response.ok) {
+      refreshRetries.current += 1;
+      if (refreshRetries.current > 3) {
+        setUser(null);
+        navigate("/login");
+      }
       return;
     }
 
+    refreshRetries.current = 0;
     const newUser = await response.json();
     setUser(newUser);
   };

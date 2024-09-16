@@ -10,6 +10,7 @@ const protectedOperations = [
   "getUserGamesHistory",
   "seekGame",
   "cancelSeekingGame",
+  "GetHighlights",
 ];
 
 const createApolloClient = async (token: string | undefined) => {

@@ -138,9 +138,9 @@ export class GamesService {
           },
         });
       }
-      clearInterval(game.timerID);
-      this.activeGames.delete(gameCode);
     }
+    clearInterval(game.timerID);
+    this.activeGames.delete(gameCode);
   }
 
   async savePlayerAnswers(

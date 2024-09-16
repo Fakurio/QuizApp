@@ -14,6 +14,7 @@ import { User } from './entities/user.entity';
 import { UsersModule } from './users/users.module';
 import { Game } from './entities/game.entity';
 import { PlayerAnswers } from './entities/player-answers.entity';
+import { HighlightsModule } from './highlights/highlights.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { PlayerAnswers } from './entities/player-answers.entity';
     GamesModule,
     AuthModule,
     UsersModule,
+    HighlightsModule,
   ],
   controllers: [],
   providers: [],
