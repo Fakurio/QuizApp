@@ -3,55 +3,54 @@ import { useAuth } from "../../contexts/AuthContext";
 import Sidepanel from "../Sidepanel/Sidepanel";
 import { InfoBox } from "../InfoBox/InfoBox";
 import "./HighlightsPage.css";
-import { useLazyQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { HIGHLIGHTS_QUERY } from "../../api/queries";
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import {
   GetHighlightsQuery,
   GetHighlightsQueryVariables,
 } from "../../__generated__/graphql";
 
-// interface Highlights {
-//   categoryName: string;
-//   difficulties: [Record<string, number>];
-// }
-
 const HighlightsPage = () => {
   const { categories } = useCategories();
   const { user } = useAuth();
-  //   const [openedCategory, setOpenedCategory] = useState<string | null>(null);
   const [fetchedHighlights, setFetchedHighlights] = useState<{
     [key: string]: GetHighlightsQuery["getHighlights"];
   }>({});
   const lastFetchedCategory = useRef<string | null>(null);
-  const [fetchScores, { data, loading }] = useLazyQuery<
+  const { loading, refetch } = useQuery<
     GetHighlightsQuery,
     GetHighlightsQueryVariables
-  >(HIGHLIGHTS_QUERY);
+  >(HIGHLIGHTS_QUERY, {
+    variables: {
+      categoryName: lastFetchedCategory.current || "",
+    },
+    skip: !lastFetchedCategory.current,
+    fetchPolicy: "cache-and-network",
+    onCompleted: (data) => {
+      if (data.getHighlights.length > 0) {
+        const fetchedCategory = data.getHighlights[0].categoryName;
+        setFetchedHighlights((prev) => ({
+          ...prev,
+          [fetchedCategory]: data.getHighlights,
+        }));
+      } else {
+        setFetchedHighlights((prev) => ({
+          ...prev,
+          [lastFetchedCategory.current || ""]: [],
+        }));
+      }
+    },
+  });
 
   const handleCategoryClick = async (categoryName: string) => {
     lastFetchedCategory.current = categoryName;
-    fetchScores({
-      variables: {
+    if (!fetchedHighlights[categoryName]) {
+      refetch({
         categoryName,
-      },
-    });
-  };
-
-  useEffect(() => {
-    if (data && data.getHighlights.length > 0) {
-      const fetchedCategory = data.getHighlights[0].categoryName;
-      setFetchedHighlights((prev) => ({
-        ...prev,
-        [fetchedCategory]: data.getHighlights,
-      }));
-    } else {
-      setFetchedHighlights((prev) => ({
-        ...prev,
-        [lastFetchedCategory.current || ""]: [],
-      }));
+      });
     }
-  }, [data]);
+  };
 
   if (!user) {
     return (

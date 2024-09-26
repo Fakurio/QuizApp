@@ -247,6 +247,7 @@ const GamePage = () => {
           gameCode={user ? location.state.gameData.gameCode : null}
           playerPoints={playerPoints.current}
           playerAnswers={playerAnswers}
+          category={location.state.gameData.categoryName}
         />
       </div>
     );
