@@ -10,6 +10,9 @@ import {
   GetHighlightsQuery,
   GetHighlightsQueryVariables,
 } from "../../__generated__/graphql";
+import { CircularProgressbarWithChildren } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
+import toFirstLetterUppercase from "../../utils/first-letter-uppercase";
 
 const HighlightsPage = () => {
   const { categories } = useCategories();
@@ -74,17 +77,35 @@ const HighlightsPage = () => {
             onClick={() => handleCategoryClick(category.name)}
           >
             <summary className="category__title">{category.name}</summary>
-            {loading && !fetchedHighlights[category.name] && <p>Loading...</p>}
+            {loading && !fetchedHighlights[category.name] && (
+              <InfoBox
+                type="info"
+                text="Loading..."
+                className="category__infobox"
+              />
+            )}
             {fetchedHighlights[category.name] ? (
               fetchedHighlights[category.name].length === 0 ? (
-                <p>No data</p>
+                <InfoBox
+                  type="info"
+                  text="No data"
+                  className="category__infobox"
+                />
               ) : (
-                fetchedHighlights[category.name].map((highlight) => (
-                  <div>
-                    <p>Difficulty: {highlight.difficultyName}</p>
-                    <p>Average score: {highlight.avgScore}</p>
-                  </div>
-                ))
+                <div className="category__progressbars">
+                  {fetchedHighlights[category.name].map((highlight) => (
+                    <div className="category__progressbars__progressbar">
+                      <CircularProgressbarWithChildren
+                        value={highlight.avgScore}
+                        maxValue={8}
+                        minValue={0}
+                      >
+                        <p>Avg: {highlight.avgScore}</p>
+                      </CircularProgressbarWithChildren>
+                      <p>{toFirstLetterUppercase(highlight.difficultyName)}</p>
+                    </div>
+                  ))}
+                </div>
               )
             ) : null}
           </details>
